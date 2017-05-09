@@ -1,0 +1,34 @@
+<ion-view class="student_add-view">
+	<ion-content>
+		<div class="bar bar-header bar-dark">
+			<h1 class="title">Klas toevoegen</h1>
+		</div>
+
+		<div class="row form-wrapper">
+			<div class="col">
+				<form name="absenceadd_form" class="absenceFrom" ng-submit="doClassAdd()" novalidate>
+
+					<div class="form-fields-outer list list-inset">
+						<h4>Naam klas</h4>
+						<label class="item item-input">
+							<input type="text" name="name" ng-model="formData.name" required>
+						</label>
+						<h4>Leerlingen</h4>
+						<label class="item item-input">
+							<select title="selectedValues" ng-model="formData.students" multiple style="width: 100%">
+								<option ng-repeat="user in users" value="{{user.email}}">{{user.name}}</option>
+							</select>
+						</label>
+						<button type="submit" class="login button button-block button-positive">
+							Toevoegen
+						</button>
+						<button class="login button button-block button-positive" ui-sref="app.classes">Annuleer</button>
+						<p ng-show="error" class="message error">{{error}}</p>
+					</div>
+				</form>
+
+			</div>
+		</div>
+
+	</ion-content>
+</ion-view>

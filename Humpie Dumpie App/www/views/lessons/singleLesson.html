@@ -1,0 +1,11 @@
+<ion-view class="lesson_single-view">
+	<ion-content>
+		<h3 class="">{{lesson.title}}</h3>
+		<h4>{{startdate}} om {{starttime}} tot {{enddate}} om {{endtime}}</h4>
+		<h5>{{lesson.description}}</h5>
+		<div class="buttons">
+			<button class="button button-block button-positive" ng-click="goToPresence()" ng-if="showPresence && canChange">Aanwezigheid</button>
+			<button class="button button-block button-positive" ng-if="canChange" ng-click="changeLesson()">Les wijzigen</button>
+		</div>
+	</ion-content>
+</ion-view>r

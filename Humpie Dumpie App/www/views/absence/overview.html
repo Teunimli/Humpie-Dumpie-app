@@ -1,0 +1,24 @@
+<ion-view class="absence-view">
+	<ion-nav-title>Absentie</ion-nav-title>
+	<ion-nav-buttons side="right">
+		<button class="button button-dark ion-plus-round" ui-sref="app.absense_add" ng-if="canAdd"></button>
+	</ion-nav-buttons>
+
+	<ion-content>
+		<ion-list class="absence">
+			<ion-item ng-repeat="absence in allAbsence" ng-class="{approvedAbsence: absence.approved == 1, pendingAbsence: absence.approved == 0 && absence.viewed == 0, rejectedAbsence: absence.approved == 0 && absence.viewed == 1}">
+				<div class="absenceContent" ui-sref="app.absencedetails({ absenceId: absence.$id })">
+					<p><b>Naam: {{absence.displayname}}</b></p>
+					<p><b>Email: {{absence.email}}</b></p>
+					<p><b>Reden: {{absence.reson}}</b></p>
+					<p>Beschrijving: {{absence.description}}</p>
+					<p>Begin datum: {{absence.begin_date |  date:'d MMMM yyyy H:mm:ss'}}</p>
+					<p>Eind datum: {{absence.end_date |  date:'d MMMM yyyy H:mm:ss'}}</p>
+				</div>
+			</ion-item>
+		</ion-list>
+
+
+	</ion-content>
+
+</ion-view>

@@ -1,0 +1,13 @@
+<ion-view class="presence-view">
+	<ion-nav-title>Aanwezigheid</ion-nav-title>
+
+	<ion-content>
+		<ion-list class="users">
+			<ion-item ng-repeat="user in users" ng-click="isPresent(user.email, $index)" ng-class="{ispresent: presentcheck[$index].present == 1}">
+				{{user.name}}
+			</ion-item>
+		</ion-list>
+
+		<button ng-click="submitPresence()" class="button button-block button-positive">Opslaan</button>
+	</ion-content>
+</ion-view>

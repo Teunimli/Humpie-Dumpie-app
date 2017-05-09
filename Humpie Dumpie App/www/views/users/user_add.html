@@ -1,0 +1,57 @@
+<ion-view class="user_add-view">
+	<ion-content>
+		<div class="bar bar-header bar-dark">
+			<h1 class="title">{{userType}} toevoegen</h1>
+		</div>
+
+		<div class="row form-wrapper">
+			<div class="col">
+				<form name="absenceadd_form" class="absenceFrom" ng-submit="doUserAdd()" novalidate>
+
+					<div class="form-fields-outer list list-inset">
+						<h4>Naam {{userType}}</h4>
+						<label class="item item-input">
+							<input type="text" name="name" ng-model="formData.name" required>
+						</label>
+						<h4>Email {{userType}}</h4>
+						<label class="item item-input">
+							<input type="email" name="email" ng-model="formData.email" required>
+						</label>
+						<h4>Wachtwoord {{userType}}</h4>
+						<label class="item item-input">
+							<input type="text" name="password" ng-model="formData.password" required>
+						</label>
+						<div ng-if="userType == 'leerling'">
+						<h4>Klas</h4>
+						<div class="list">
+
+							<label class="item item-input item-select">
+								<div class="input-label">
+									Klas
+								</div>
+								<select ng-model="formData.class">
+									<option ng-repeat="class in classes" value="{{class.name}}">{{ class.name }}</option>
+								</select>
+							</label>
+
+						</div>
+						</div>
+						<div class="repeatPassword">
+							<h4>Voer uw wachtwoord opnieuw in</h4>
+							<label class="item item-input">
+								<input type="password" name="currentUserPassword" ng-model="formData.currentUserPassword">
+							</label>
+						</div>
+						<button type="submit" class="login button button-block button-positive">
+							Toevoegen
+						</button>
+						<button class="login button button-block button-positive" ui-sref="app.students">Annuleer</button>
+						<p ng-show="error" class="message error">{{error}}</p>
+					</div>
+				</form>
+
+			</div>
+		</div>
+
+	</ion-content>
+</ion-view>
