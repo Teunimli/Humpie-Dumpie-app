@@ -28,14 +28,14 @@ angular.module('rooster.app.controllers', [])
 						case 'leidster':
 							$scope.menucontent = [
 								{
-									title: 'Rooster',
+									title: 'Huidige groep',
 									type: 'sref',
-									action: 'app.rooster'
+									action: 'app.group'
 								},
 								{
-									title: 'Absentie',
+									title: 'Beheer',
 									type: 'sref',
-									action: 'app.absence'
+									action: 'app.management'
 								},
 								{
 									title: 'Uitloggen',
@@ -63,81 +63,8 @@ angular.module('rooster.app.controllers', [])
 								}
 							];
 							break;
-						case 'roostermaker':
-							$scope.menucontent = [
-								{
-									title: 'Klassen',
-									type: 'sref',
-									action: 'app.classes'
-								},
-								{
-									title: 'Lessen',
-									type: 'sref',
-									action: ''
-								},
-								{
-									title: 'Lokalen',
-									type: 'click',
-									action: ''
-								},
-								{
-									title: 'Uitloggen',
-									type: 'click',
-									action: 'doLogOut()'
-								}
-							];
-							break;
-						case 'admin':
-							$scope.menucontent = [
-								{
-									title: 'Leerlingen',
-									type: 'click',
-									action: 'goToUsers(\'leerling\')'
-								},
-								{
-									title: 'Docenten',
-									type: 'click',
-									action: 'goToUsers(\'docent\')'
-								},
-								{
-									title: 'Roostermakers',
-									type: 'click',
-									action: 'goToUsers(\'roostermaker\')'
-								},
-								{
-									title: 'Admins',
-									type: 'click',
-									action: 'goToUsers(\'admin\')'
-								},
-								{
-									title: 'Klassen',
-									type: 'sref',
-									action: 'app.classes'
-								},
-								{
-									title: 'Lokalen',
-									type: 'sref',
-									action: ''
-								},
-								{
-									title: 'Uitloggen',
-									type: 'click',
-									action: 'doLogOut()'
-								}
-							];
-							break;
 						default:
 							$scope.menucontent = [
-								{
-									title: 'Rooster',
-									type: 'sref',
-									action: 'app.rooster'
-								},
-								{
-									title: 'Absentie',
-									type: 'sref',
-									action: 'app.absence'
-								},
 								{
 									title: 'Uitloggen',
 									type: 'click',
@@ -221,7 +148,54 @@ angular.module('rooster.app.controllers', [])
 	.controller('GroupCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
 
-		})
+    })
+    
+    .controller('ManagementCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+
+    })
+
+    .controller('ChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+        var fb = firebase.database();
+        $scope.formData = {};
+
+        function writeChildData(userId, name, date_of_birth, email, phonenumber, second_phonenumber, docter_phonenumber, homedocter_phonenumber, peculiarities) {
+            fb.ref('childs/' + userId).set({
+                name: name,
+                date_of_birth: date_of_birth,
+                email : email,
+                phonenumber : phonenumber,
+                second_phonenumber: second_phonenumber,
+                docter_phonenumber: docter_phonenumber,
+                homedocter_phonenumber: homedocter_phonenumber,
+                peculiarities : peculiarities
+            });
+        }
+
+        $scope.doChildAdd = function(){
+            var date_of_birth = $scope.formData.date_of_birth.getTime();
+
+            var childs = fb.ref('childs');
+
+            childs.once('value', function (data) {
+
+                var allChilds = data.val();
+
+                if($scope.formData.second_phonenumber == null){
+                    $scope.formData.second_phonenumber = 0;
+                }
+
+                if (allChilds == null) {
+                    writeChildData(0, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities);
+                } else {
+                    writeChildData(allChilds.length, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities);
+                }
+            });
+        }
+
+    })
+    
+    
 
 	.controller('AdminCtrl', function($scope, $state, $firebaseArray) {
 		$scope.title = 'Admin overzicht';

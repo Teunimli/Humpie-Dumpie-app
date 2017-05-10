@@ -45,6 +45,7 @@ angular.module('rooster', [
             templateUrl: "views/auth/login.html",
             controller: 'AuthCtrl'
           })
+          
 	      .state('app.group', {
 		      url: "/group",
 		      views: {
@@ -54,6 +55,26 @@ angular.module('rooster', [
 			      }
 		      }
 	      })
+
+          .state('app.add_child', {
+              url: "/add_child",
+              views: {
+                  'menuContent': {
+                      templateUrl   : "views/child/add_child.html",
+                      controller: 'ChildCtrl'
+                  }
+              }
+          })
+
+          .state('app.management', {
+              url: "/management",
+              views: {
+                  'menuContent': {
+                      templateUrl   : "views/management/list.html",
+                      controller: 'ManagementCtrl'
+                  }
+              }
+          })
 
 		  .state('app.admin', {
 			  url: "/admin",
