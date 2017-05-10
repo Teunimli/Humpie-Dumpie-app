@@ -1,5 +1,19 @@
 /* Empty. Add your own CSS if you like */
 
+.other {
+    width: 50%;
+    float: left;
+    margin-right: 50%;
+    margin-bottom: 20px;
+    white-space: normal;
+}
+.self {
+    width: 50%;
+    float: right;
+    margin-bottom: 20px;
+    white-space: normal;
+}
+
 
 .app-logo {
     width: 60%;

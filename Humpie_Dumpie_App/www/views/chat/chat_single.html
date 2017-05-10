@@ -1,0 +1,19 @@
+<ion-view class="chat-single">
+
+	<ion-nav-title>{{title}}</ion-nav-title>
+	<ion-nav-buttons side="right">
+		<button class="button button-dark ion-plus-round" ui-sref="app.lesson_add" ng-if="canAdd"></button>
+	</ion-nav-buttons>
+	<ion-content>
+		<ion-list class="messages">
+			<ion-item class="other"> Bericht van ouder	</ion-item>
+			<ion-item class="self"> Bericht van leidster zelf	</ion-item>
+			<ion-item class="other"> Bericht van ouder	</ion-item>
+			<ion-item class="self"> Eeen lang bericht van de leidster zodat de woorden op de volgende regel komen als ze een lang bericht gaan sturen	</ion-item>
+		</ion-list>
+	</ion-content>
+	<ion-footer-bar>
+		<input type="text" style="width: 80%">
+		<button style="width: 20%">send</button>
+	</ion-footer-bar>
+</ion-view>

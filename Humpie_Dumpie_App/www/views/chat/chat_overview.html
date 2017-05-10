@@ -1,0 +1,13 @@
+<ion-view class="chat-overview">
+
+	<ion-nav-title>title</ion-nav-title>
+	<ion-nav-buttons side="right">
+		<button class="button button-dark ion-plus-round" ui-sref="app.lesson_add" ng-if="canAdd"></button>
+	</ion-nav-buttons>
+	<ion-content>
+		<ion-list class="users">
+			<ion-item ng-click="goToSingleChat(1)" > chat 1	<span class="pull-right"> > </span></ion-item>
+			<ion-item ng-click="goToSingleChat(2)"> chat 2	<span class="pull-right"> > </span></ion-item>
+		</ion-list>
+	</ion-content>
+</ion-view>

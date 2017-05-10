@@ -38,6 +38,11 @@ angular.module('rooster.app.controllers', [])
 									action: 'app.management'
 								},
 								{
+									title: 'Chat',
+									type: 'sref',
+									action: 'app.chat'
+								},
+								{
 									title: 'Uitloggen',
 									type: 'click',
 									action: 'doLogOut()'
@@ -196,6 +201,20 @@ angular.module('rooster.app.controllers', [])
     })
     
     
+
+	.controller('ChatCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+
+		$scope.goToSingleChat = function(chatID) {
+			$state.go('app.singleChat', {"chatID": chatID});
+		}
+	})
+
+	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+		var chatid = $stateParams['chatID'];
+		console.log(chatid);
+	})
 
 	.controller('AdminCtrl', function($scope, $state, $firebaseArray) {
 		$scope.title = 'Admin overzicht';

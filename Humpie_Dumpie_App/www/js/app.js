@@ -86,6 +86,25 @@ angular.module('rooster', [
 			  }
 		  })
 
+	      .state('app.chat', {
+		      url: "/chat",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/chat/chat_overview.html",
+				      controller: 'ChatCtrl'
+			      }
+		      }
+	      })
+	      .state('app.singleChat', {
+		      url: "/singleChat:chatID",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/chat/chat_single.html",
+				      controller: 'SingleChatCtrl'
+			      }
+		      }
+	      })
+
           .state('app.rooster', {
               url: "/rooster",
               views: {
@@ -176,45 +195,7 @@ angular.module('rooster', [
 		      }
 	      })
 
-          .state('app.absense_add', {
-              url: "/absense_add",
-              views: {
-                  'menuContent': {
-                      templateUrl   : "views/absence/absense_add.html",
-                      controller: 'AbsenceCtrl'
-                  }
-              }
-          })
 
-	      .state('app.absence', {
-		      url: "/absence",
-		      views: {
-			      'menuContent': {
-				      templateUrl   : "views/absence/overview.html",
-				      controller: 'AbsenceCtrl'
-			      }
-		      }
-	      })
-
-          .state('app.absencedetails', {
-              url: "/absencedetails/:absenceId",
-              views: {
-                  'menuContent': {
-                      templateUrl   : "views/absence/details.html",
-                      controller: 'AbsenceDetailCtrl'
-                  }
-              }
-          })
-
-		  .state('app.classesdetails', {
-              url: "/classesdetails/:classesId",
-              views: {
-                  'menuContent': {
-                      templateUrl   : "views/classes/details.html",
-                      controller: 'ClassesDetailCtrl'
-                  }
-              }
-          })
       ;
       
       
