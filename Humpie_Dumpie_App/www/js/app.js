@@ -45,6 +45,15 @@ angular.module('rooster', [
             templateUrl: "views/auth/login.html",
             controller: 'AuthCtrl'
           })
+	      .state('app.group', {
+		      url: "/group",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/group/group.html",
+				      controller: 'GroupCtrl'
+			      }
+		      }
+	      })
 
 		  .state('app.admin', {
 			  url: "/admin",
