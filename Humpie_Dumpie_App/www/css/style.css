@@ -14,6 +14,21 @@
     white-space: normal;
 }
 
+/* zorgt voor kruisje naast de naam */
+.flex-row{
+    display: flex;
+    flex-direction: row;
+}
+
+/* zorgt voor kruisje helemaal rechts van het veld*/
+.flex-between{
+    display: flex;
+    justify-content: space-between;
+}
+
+i.delete{
+    color:red;
+}
 
 .app-logo {
     width: 60%;

@@ -161,10 +161,16 @@ angular.module('rooster.app.controllers', [])
     })
 
     .controller('ChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
-        var fb = firebase.database();
+		var user = firebase.auth().currentUser;
+		var fb = firebase.database();
         $scope.formData = {};
 
-        function writeChildData(userId, name, date_of_birth, email, phonenumber, second_phonenumber, docter_phonenumber, homedocter_phonenumber, peculiarities) {
+		var Childs = fb.ref('childs');
+
+		var fireRef = Childs.orderByChild('isDeleted').equalTo(0);
+		$scope.allChilds = $firebaseArray(fireRef);
+
+		function writeChildData(userId, name, date_of_birth, email, phonenumber, second_phonenumber, docter_phonenumber, homedocter_phonenumber, peculiarities, isDeleted) {
             fb.ref('childs/' + userId).set({
                 name: name,
                 date_of_birth: date_of_birth,
@@ -173,7 +179,8 @@ angular.module('rooster.app.controllers', [])
                 second_phonenumber: second_phonenumber,
                 docter_phonenumber: docter_phonenumber,
                 homedocter_phonenumber: homedocter_phonenumber,
-                peculiarities : peculiarities
+                peculiarities : peculiarities,
+				isDeleted : isDeleted
             });
         }
 
@@ -191,16 +198,68 @@ angular.module('rooster.app.controllers', [])
                 }
 
                 if (allChilds == null) {
-                    writeChildData(0, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities);
-                } else {
-                    writeChildData(allChilds.length, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities);
-                }
+                    writeChildData(0, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
+					$state.go('app.management');
+				} else {
+                    writeChildData(allChilds.length, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
+					$state.go('app.management');
+				}
             });
         }
 
     })
-    
-    
+
+	.controller('ChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+		$scope.formData = {};
+
+		var childID = $stateParams.childId;
+		var child = fb.ref("childs/" + childID);
+		child.once('value', function (data) {
+			$scope.formData = data.val();
+		});
+
+		function writeChildData(userId, name, date_of_birth, email, phonenumber, second_phonenumber, docter_phonenumber, homedocter_phonenumber, peculiarities, isDeleted) {
+			fb.ref('childs/' + userId).set({
+				name: name,
+				date_of_birth: date_of_birth,
+				email : email,
+				phonenumber : phonenumber,
+				second_phonenumber: second_phonenumber,
+				docter_phonenumber: docter_phonenumber,
+				homedocter_phonenumber: homedocter_phonenumber,
+				peculiarities : peculiarities,
+				isDeleted : isDeleted
+			});
+		}
+
+		$scope.doChildUpdate = function(){
+			var date_of_birth = $scope.formData.date_of_birth.getTime();
+
+			writeChildData(childID, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
+			$state.go('app.management');
+		}
+	})
+
+	.controller('DeleteChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+		var Childs = fb.ref('childs');
+
+		var fireRef = Childs.orderByChild('isDeleted').equalTo(0);
+		$scope.allChilds = $firebaseArray(fireRef);
+
+		function writeChildData(userId, isDeleted) {
+			fb.ref('childs/' + userId).update({
+				isDeleted : isDeleted
+			});
+		}
+
+		$scope.doChildDelete = function($id){
+
+			writeChildData($id, 1);
+			$state.go('app.management');
+		}
+	})
 
 	.controller('ChatCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
@@ -361,6 +420,11 @@ angular.module('rooster.app.controllers', [])
 
 	})
 
+
+	.controller('UserTypeListCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		console.log('UserTypeListCtrl');
+	})
+
 	.controller('UserCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		console.log('test');
 		$scope.formData = {};
@@ -425,6 +489,7 @@ angular.module('rooster.app.controllers', [])
 
 		$scope.doUserAdd = function () {
 
+
 			var users = fb.ref('users');
 			var hasAdded = false;
 
@@ -448,14 +513,14 @@ angular.module('rooster.app.controllers', [])
 							var allUsers = data.val();
 
 							if (allUsers == null) {
-								if(userType == 'leerling') {
+								if(userType == 'ouder') {
 									writeUserData(0, $scope.formData.email, $scope.formData.name , userType, $scope.formData.class);
 								} else {
 									writeUserData(0, $scope.formData.email, $scope.formData.name , userType, '');
 								}
 
 							} else {
-								if(userType == 'leerling') {
+								if(userType == 'leidster') {
 									writeUserData(allUsers.length, $scope.formData.email, $scope.formData.name , userType, $scope.formData.class);
 								} else {
 									writeUserData(0, $scope.formData.email, $scope.formData.name , userType, '');

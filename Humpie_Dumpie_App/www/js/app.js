@@ -66,6 +66,36 @@ angular.module('rooster', [
               }
           })
 
+		  .state('app.change_child_list', {
+			  url: "/change_child_list",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/child/change_child_list.html",
+					  controller: 'ChildCtrl'
+				  }
+			  }
+		  })
+
+		  .state('app.delete_child_list', {
+			  url: "/delete_child_list",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/child/delete_child_list.html",
+					  controller: 'DeleteChildCtrl'
+				  }
+			  }
+		  })
+
+		  .state('app.change_child', {
+			  url: "/change_child/:childId",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/child/change_child.html",
+					  controller: 'ChangeChildCtrl'
+				  }
+			  }
+		  })
+
           .state('app.management', {
               url: "/management",
               views: {
@@ -164,6 +194,16 @@ angular.module('rooster', [
 			      }
 		      }
 	      })
+
+		  .state('app.usertype', {
+			  url: "/usertype",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/users/usertype.html",
+					  controller: 'UserTypeListCtrl'
+				  }
+			  }
+		  })
 
 	      .state('app.user_add', {
 		      url: "/user_add:userType",

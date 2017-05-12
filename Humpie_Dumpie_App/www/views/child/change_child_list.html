@@ -1,0 +1,16 @@
+<ion-view class="change_child_list-view">
+    <ion-nav-title>{{title}}</ion-nav-title>
+
+    <ion-content>
+        <ion-list class="change_child_list">
+            <ion-item ng-repeat="child in allChilds">
+                <div class="childContent" ui-sref="app.change_child({ childId: child.$id })">
+                    <p><b>Naam: {{child.name}}</b></p>
+                </div>
+            </ion-item>
+        </ion-list>
+
+
+    </ion-content>
+
+</ion-view>

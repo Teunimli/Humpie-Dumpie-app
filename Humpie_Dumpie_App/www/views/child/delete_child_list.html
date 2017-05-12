@@ -1,0 +1,17 @@
+<ion-view class="change_child_list-view">
+    <ion-nav-title>{{title}}</ion-nav-title>
+
+    <ion-content>
+        <ion-list class="change_child_list">
+            <ion-item ng-repeat="child in allChilds">
+                <div class="childContent flex-row flex-between">
+                    <p><b>Naam: {{child.name}}</b></p>
+                    <i class="delete ion-close-round" ng-click="doChildDelete(child.$id)"></i>
+                </div>
+            </ion-item>
+        </ion-list>
+
+
+    </ion-content>
+
+</ion-view>
