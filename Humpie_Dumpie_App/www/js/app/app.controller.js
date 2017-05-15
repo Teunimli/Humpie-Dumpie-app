@@ -263,6 +263,33 @@ angular.module('rooster.app.controllers', [])
 
 	.controller('ChatCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
+		var chats = fb.ref('chats');
+		var allChats = $firebaseArray(chats);
+
+		allChats.$loaded()
+			.then(function(){
+				angular.forEach(allChats, function(chat) {
+					var parent = fb.ref("users/" + chat.parentId);
+					var parents = $firebaseArray(parent);
+
+					parents.$loaded()
+						.then(function(){
+							angular.forEach(parents, function (parentdata) {
+								console.log(parentdata);
+								if(parentdata.$id == 'name') {
+									chat.name = parentdata.$value;
+								}
+							});
+							$scope.allChats = allChats;
+						})
+
+				})
+			});
+
+
+
+
+
 
 		$scope.goToSingleChat = function(chatID) {
 			$state.go('app.singleChat', {"chatID": chatID});
@@ -272,7 +299,83 @@ angular.module('rooster.app.controllers', [])
 	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
 		var chatid = $stateParams['chatID'];
-		console.log(chatid);
+		var chats = fb.ref('chats/' + chatid);
+		var chat = $firebaseArray(chats);
+
+		chat.$loaded()
+			.then(function(){
+				$scope.messages = chat[0];
+
+					angular.forEach(chat[0], function (chatdata) {
+
+						var messageDate = new Date(chatdata.datetime);
+						chatdata.messageDate = messageDate.getDate() + '-' + messageDate.getMonth() + '-' + messageDate.getFullYear() + ' ' + messageDate.getHours() + ':' + messageDate.getMinutes();
+
+						var users = fb.ref("users/" + chatdata.userId);
+						var user = $firebaseArray(users);
+						user.$loaded()
+							.then(function () {
+								angular.forEach(user, function (userdata) {
+									if (userdata.$id == 'name') {
+
+										chatdata.name = userdata.$value;
+									}
+									if (userdata.$id == 'email') {
+										var curuser = firebase.auth().currentUser;
+										var curemail;
+										if (curuser) {
+											curemail = curuser.email;
+										} else {
+											$state.go('login');
+										}
+
+										if (curemail == userdata.$value) {
+											chatdata.self = true;
+										} else {
+											chatdata.self = false;
+										}
+
+
+									}
+								});
+
+							});
+					});
+			});
+
+		function writeMessageData(chatId, messageId, content, datetime, read, userId) {
+			fb.ref('chats/' + chatId + '/messages/' + messageId).set({
+				content: content,
+				datetime: datetime,
+				read : read,
+				userId : userId
+			});
+			// $state.go('app.rooster');
+		}
+
+		$scope.sendMessage = function () {
+			var message = $scope.formData.messageContent;
+			var users = fb.ref('users');
+			var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
+			var userdata = $firebaseArray(fireRef);
+			userdata.$loaded()
+				.then(function () {
+					var messages = fb.ref('chats/' + $stateParams['chatID'] + '/messages' );
+
+					messages.once('value', function (data) {
+
+						var allMessages = data.val();
+						var date = new Date();
+						if (allMessages == null) {
+							writeMessageData($stateParams['chatID'], 0, message , date.getTime(), 0, parseInt(userdata[0].$id));
+						} else {
+							writeMessageData($stateParams['chatID'], allMessages.length, message ,  date.getTime(), 0, parseInt(userdata[0].$id));
+						}
+					});
+				});
+
+
+		};
 	})
 
 	.controller('AdminCtrl', function($scope, $state, $firebaseArray) {
@@ -426,7 +529,6 @@ angular.module('rooster.app.controllers', [])
 	})
 
 	.controller('UserCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
-		console.log('test');
 		$scope.formData = {};
 		var userType = $stateParams.userType;
 		$scope.userType = userType;
@@ -442,7 +544,6 @@ angular.module('rooster.app.controllers', [])
 		$scope.addUser = function (userType) {
 			$state.go('app.user_add', {userType: userType});
 		};
-		console.log(userType);
 		var fb = firebase.database();
 
 		var classes = fb.ref("classes");

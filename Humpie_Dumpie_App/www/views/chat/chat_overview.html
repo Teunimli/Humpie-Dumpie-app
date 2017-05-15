@@ -6,8 +6,7 @@
 	</ion-nav-buttons>
 	<ion-content>
 		<ion-list class="users">
-			<ion-item ng-click="goToSingleChat(1)" > chat 1	<span class="pull-right"> > </span></ion-item>
-			<ion-item ng-click="goToSingleChat(2)"> chat 2	<span class="pull-right"> > </span></ion-item>
+			<ion-item ng-repeat="chat in allChats" ng-click="goToSingleChat(chat.$id)" > {{chat.name}}	<span class="pull-right"> > </span></ion-item>
 		</ion-list>
 	</ion-content>
 </ion-view>

@@ -6,14 +6,17 @@
 	</ion-nav-buttons>
 	<ion-content>
 		<ion-list class="messages">
-			<ion-item class="other"> Bericht van ouder	</ion-item>
-			<ion-item class="self"> Bericht van leidster zelf	</ion-item>
-			<ion-item class="other"> Bericht van ouder	</ion-item>
-			<ion-item class="self"> Eeen lang bericht van de leidster zodat de woorden op de volgende regel komen als ze een lang bericht gaan sturen	</ion-item>
+			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}">
+				<p>{{message.content}}</p>
+				<span class="messageName">{{message.name}}</span>
+				<span class="messageTime">{{message.messageDate}}</span>
+			</ion-item>
 		</ion-list>
 	</ion-content>
 	<ion-footer-bar>
-		<input type="text" style="width: 80%">
-		<button style="width: 20%">send</button>
+		<form ng-submit="sendMessage()" class="messageForm" novalidate>
+			<input type="text" name="messageContent" ng-model="formData.messageContent">
+			<button>send</button>
+		</form>
 	</ion-footer-bar>
 </ion-view>

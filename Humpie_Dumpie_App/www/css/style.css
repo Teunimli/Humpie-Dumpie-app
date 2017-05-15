@@ -26,8 +26,26 @@
     justify-content: space-between;
 }
 
-i.delete{
-    color:red;
+i.delete {
+    color: red;
+}
+.messageForm {
+    width: 100%;
+}
+.messageForm input[type=text] {
+    display: inline-block;
+    width: 75%;
+}
+.messageForm button {
+    width: 20%;
+}
+.messages p {
+    white-space: normal;
+    font-weight: bold;
+}
+.messages .messageName, .messages .messageTime {
+    font-size: 13px;
+
 }
 
 .app-logo {
