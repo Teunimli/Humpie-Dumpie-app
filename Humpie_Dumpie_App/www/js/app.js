@@ -215,29 +215,16 @@ angular.module('rooster', [
 		      }
 	      })
 
-	      .state('app.classes', {
-		      url: "/classes",
+	      .state('app.groupdivide', {
+		      url: "/groupdivide",
 		      views: {
 			      'menuContent': {
-				      templateUrl   : "views/classes/classes.html",
-				      controller: 'ClassesCtrl'
+				      templateUrl   : "views/group/divide.html",
+				      controller: 'GroupCtrl'
 			      }
 		      }
 	      })
-
-	      .state('app.class_add', {
-		      url: "/class_add",
-		      views: {
-			      'menuContent': {
-				      templateUrl   : "views/classes/class_add.html",
-				      controller: 'ClassesCtrl'
-			      }
-		      }
-	      })
-
-
       ;
-      
       
       // if none of the above states are matched, use this as the fallback
       $urlRouterProvider.otherwise('/login');

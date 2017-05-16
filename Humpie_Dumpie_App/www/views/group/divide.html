@@ -1,0 +1,30 @@
+<ion-view class="management_list-view">
+
+    <ion-nav-title>{{title}}</ion-nav-title>
+    <ion-content>
+
+        <div class="row form-wrapper">
+            <div class="col">
+                <form name="absenceadd_form" class="absenceFrom" ng-submit="SelectGroupDate()" novalidate>
+
+                        <h4>Datum</h4>
+                        <ion-list>
+                            <div class="item" ion-datetime-picker ng-model="formData.date_of_birth">
+                                {{formData.date_of_birth| date: "dd-MM-yyyy"}}
+                            </div>
+                        </ion-list>
+
+                        <button type="submit" class="login button button-block button-positive">
+                            Verder
+                        </button>
+                        <button class="login button button-block button-positive" ui-sref="app.students">Annuleer</button>
+                        <p ng-show="error" class="message error">{{error}}</p>
+                </form>
+
+            </div>
+        </div>
+
+
+    </ion-content>
+
+</ion-view>
