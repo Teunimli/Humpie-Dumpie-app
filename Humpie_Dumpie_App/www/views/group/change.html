@@ -1,0 +1,16 @@
+<ion-view class="change_group_list-view">
+
+    <ion-nav-title>{{title}}</ion-nav-title>
+    <ion-content>
+
+        <ion-list class="change_child_list">
+            <ion-item ng-repeat="group in allGroups">
+                <div class="groupContent" ng-model="formData.date" ui-sref="app.changegroupdate({ date: group.date })">
+                    {{group.date| date: "dd-MM-yyyy"}}
+                </div>
+            </ion-item>
+        </ion-list>
+
+    </ion-content>
+
+</ion-view>

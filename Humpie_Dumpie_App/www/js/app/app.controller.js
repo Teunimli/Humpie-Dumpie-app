@@ -190,11 +190,6 @@ angular.module('humpieDumpie.app.controllers', [])
         }
 
     })
-
-	.controller('GroupCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
-		var fb = firebase.database();
-
-    })
     
     .controller('ManagementCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
@@ -203,12 +198,124 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	.controller('GroupCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
-		var formData = {};
+		$scope.formData = {};
+		$scope.object = {};
+		$scope.isChecked = false;
+		$scope.selected = [];
+		$scope.childdata = [];
+		$scope.childdetaildata = {};
 
-		console.log(formData.date_of_birth);
+		var Childs = fb.ref('childs');
+
+		var fireRef = Childs.orderByChild('isDeleted').equalTo(0);
+		$scope.allChilds = $firebaseArray(fireRef);
+
+
+
+		$scope.addGroupDate = function(){
+			var date = $scope.formData.date.getTime();
+
+			var groups = fb.ref('groups');
+
+			groups.once('value', function (data) {
+
+				var allGroups = data.val();
+
+				if(allGroups == null){
+					$state.go('app.addgroupchild',{ date: date });
+				}else{
+					angular.forEach(allGroups, function(group) {
+
+						if(group.date == date){
+							$state.go('app.management');
+						}else{
+							$state.go('app.addgroupchild',{ date: date });
+						}
+					})
+				}
+
+			});
+			
+		};
+
+		$scope.checkedOrNot = function (asset, isChecked, index) {
+			if (isChecked) {
+				$scope.selected.push(asset);
+			} else {
+				var _index = $scope.selected.indexOf(asset);
+				$scope.selected.splice(_index, 1);
+			}
+		};
+
+		function writeDataData(userId, date) {
+			fb.ref('groups/' + userId).set({
+				date: date
+			});
+		}
+
+		$scope.addGroupChild = function () {
+			var groupDate = $stateParams.date;
+
+			var groups = fb.ref('groups');
+
+			groups.once('value', function (data) {
+
+				var allGroups = data.val();
+
+
+				if (allGroups == null) {
+					writeDataData(0, groupDate);
+
+					angular.forEach($scope.selected, function(group) {
+						$scope.childdetaildata = {
+							id: group.$id,
+							name: group.name,
+							peculiarities : group.peculiarities
+						};
+						$scope.childdata.push($scope.childdetaildata);
+					});
+					fb.ref('/groups/' + 0 ).update({ childs:  $scope.childdata});
+
+					$state.go('app.management');
+				} else {
+					var groepslength = allGroups.length;
+					writeDataData(groepslength, groupDate);
+
+					angular.forEach($scope.selected, function(group) {
+						$scope.childdetaildata = {
+							id: group.$id,
+							name: group.name,
+							peculiarities : group.peculiarities
+						};
+						$scope.childdata.push($scope.childdetaildata);
+					});
+					fb.ref('/groups/' + groepslength ).update({ childs:  $scope.childdata});
+
+					$state.go('app.management');
+				}
+
+			});
+		}
+
 	})
 
-    .controller('ChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('GroupChangeCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+
+		var Groups = fb.ref('groups');
+
+		var fireRef = Groups.orderByChild('date');
+		$scope.allGroups= $firebaseArray(fireRef);
+
+	})
+
+	.controller('GroupChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+
+		
+	})
+
+	.controller('ChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var user = firebase.auth().currentUser;
 		var fb = firebase.database();
         $scope.formData = {};

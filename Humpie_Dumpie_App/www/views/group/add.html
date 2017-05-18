@@ -1,0 +1,29 @@
+<ion-view class="add_group_child_list-view">
+
+    <ion-nav-title>{{title}}</ion-nav-title>
+    <ion-content>
+
+        <div class="row form-wrapper">
+            <div class="col">
+
+                    <h4>Kies de kinderen voor de dag</h4>
+                    <ion-list class="change_child_list">
+                        <ion-item ng-repeat="child in allChilds">
+                            <div class="childContent">
+                                <ion-checkbox ng-model="isChecked" ng-change="checkedOrNot(child, isChecked, $index)" ng-init="isChecked=false">{{child.name}}</ion-checkbox>
+                            </div>
+                        </ion-item>
+                    </ion-list>
+
+                    <button type="submit" class="login button button-block button-positive" ng-click="addGroupChild()">
+                        Toevoegen
+                    </button>
+                    <p ng-show="error" class="message error">{{error}}</p>
+
+            </div>
+        </div>
+
+
+    </ion-content>
+
+</ion-view>

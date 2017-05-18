@@ -223,6 +223,36 @@ angular.module('humpieDumpie', [
 			      }
 		      }
 	      })
+
+		  .state('app.addgroupchild', {
+			  url: "/addgroupchild:date",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/group/add.html",
+					  controller: 'GroupCtrl'
+				  }
+			  }
+		  })
+
+		  .state('app.changegroup', {
+			  url: "/changegroup",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/group/change.html",
+					  controller: 'GroupChangeCtrl'
+				  }
+			  }
+		  })
+
+		  .state('app.changegroupdate', {
+			  url: "/changegroup:date",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/group/change_list.html",
+					  controller: 'GroupChangeChildCtrl'
+				  }
+			  }
+		  })
       ;
       
       // if none of the above states are matched, use this as the fallback
