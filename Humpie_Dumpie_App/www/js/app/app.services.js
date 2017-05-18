@@ -1,4 +1,4 @@
-angular.module('rooster.app.services', [])
+angular.module('humpieDumpie.app.services', [])
 
 	.service('AbsenceService', function ($http, $rootScope, $q) {
 

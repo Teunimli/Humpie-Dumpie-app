@@ -1,15 +1,14 @@
-angular.module('rooster.app.controllers', [])
+angular.module('humpieDumpie.app.controllers', [])
 
 	.controller('AppCtrl', function($scope, $ionicModal, $state, $firebaseArray) {
 		$scope.logo = "img/logo.png";
-
+		var curemail;
 		var user = firebase.auth().currentUser;
 		if (user) {
-			var curemail = user.email;
+			curemail = user.email;
 		} else {
 			$state.go('login');
 		}
-
 
 		var fb = firebase.database();
 		var users = fb.ref('users');
@@ -17,6 +16,14 @@ angular.module('rooster.app.controllers', [])
 		$scope.menucontent = [];
 
 
+
+
+		function writeChatData(chatId, messages, parentId) {
+			fb.ref('chats/' + chatId).set({
+				messages: messages,
+				parentId: parentId
+			});
+		}
 		var fireRef = users.orderByChild('email').equalTo(curemail);
 		var curuser = $firebaseArray(fireRef);
 
@@ -49,24 +56,55 @@ angular.module('rooster.app.controllers', [])
 								}
 							];
 							break;
-						case 'docent':
-							$scope.menucontent = [
-								{
-									title: 'Rooster',
-									type: 'sref',
-									action: 'app.rooster'
-								},
-								{
-									title: 'Absentie',
-									type: 'sref',
-									action: 'app.absence'
-								},
-								{
-									title: 'Uitloggen',
-									type: 'click',
-									action: 'doLogOut()'
-								}
-							];
+						case 'ouder':
+							var users = fb.ref('users');
+							var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
+							var userdata = $firebaseArray(fireRef);
+							userdata.$loaded()
+								.then(function () {
+									var userid = parseInt(userdata[0].$id);
+									var chats = fb.ref('chats');
+									var chatRef = chats.orderByChild('parentId').equalTo(userid);
+									var chatdata = $firebaseArray(chatRef);
+									chatdata.$loaded()
+										.then(function () {
+											console.log(chatdata.length);
+											if(chatdata.length > 0) {
+												var chatid = chatdata[0].$id;
+
+												$scope.menucontent = [
+													{
+														title: 'Chat',
+														type: 'click',
+														action: 'goToSingleChat(' + chatid + ')'
+													},
+													{
+														title: 'Absentie',
+														type: 'sref',
+														action: 'app.absence'
+													},
+													{
+														title: 'Uitloggen',
+														type: 'click',
+														action: 'doLogOut()'
+													}
+												];
+											} else {
+												var chats = fb.ref('chats');
+
+												chats.once('value', function (data) {
+
+													var allChats = data.val();
+													if (allChats == null) {
+														writeChatData(0, [], userid);
+													} else {
+														writeChatData(allChats.length, [], userid);
+													}
+												});
+											}
+										});
+								});
+
 							break;
 						default:
 							$scope.menucontent = [
@@ -92,6 +130,9 @@ angular.module('rooster.app.controllers', [])
 		$scope.goToUsers = function (userType) {
 			$state.go('app.users', {userType: userType});
 		}
+		$scope.goToSingleChat = function(chatID) {
+			$state.go('app.singleChat', {"chatID": chatID});
+		}
 	})
 
     .controller('AuthCtrl', function ($scope, $state, $ionicModal, $firebaseArray) {
@@ -113,7 +154,7 @@ angular.module('rooster.app.controllers', [])
 								role = user.role;
 								switch (role) {
 									case 'ouder':
-										$state.go('app.rooster');
+										$state.go('app.group');
 									break;
 									case 'leidster':
 										$state.go('app.group');
@@ -308,6 +349,75 @@ angular.module('rooster.app.controllers', [])
 		var chatid = $stateParams['chatID'];
 		var chats = fb.ref('chats/' + chatid);
 		var chat = $firebaseArray(chats);
+		$scope.formData = {};
+		console.log('test');
+
+
+		var img = fb.ref('images');
+		$scope.imgs = $firebaseArray(img);
+
+		var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
+
+		$scope.imageUpload = function(ele) {
+
+
+				var sFileName = $("#imageUpload").val();
+				if (sFileName.length > 0) {
+					var blnValid = false;
+					for (var j = 0; j < _validFileExtensions.length; j++) {
+						var sCurExtension = _validFileExtensions[j];
+						if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+							blnValid = true;
+							var filesSelected = document.getElementById("imageUpload").files;
+							if (filesSelected.length > 0) {
+								var fileToLoad = filesSelected[0];
+
+								var fileReader = new FileReader();
+
+								fileReader.onload = function(fileLoadedEvent) {
+
+
+									$scope.sendMessage('image', fileLoadedEvent.target.result)
+								};
+
+								fileReader.readAsDataURL(fileToLoad);
+							}
+							break;
+						}
+					}
+
+					if (!blnValid) {
+						alert('File is not valid');
+						return false;
+					}
+				}
+
+				return true;
+
+
+
+			// var storageRef = firebase.storage().ref();
+			// var image = ele.files[0].name;
+			// var reader = new FileReader();
+			// reader.onload = function () {
+			// 	var imageRef = storageRef.child(ele.files[0].name);
+			// 	var mountainImagesRef = storageRef.child('images/' + ele.files[0].name);
+			// 	$scope.fileContent = reader.result;
+			// 	$scope.$apply();
+			// };
+			// reader.readAsText(ele.files[0]);
+			//
+			// console.log(image);
+
+
+		};
+		$scope.openUpload = function() {
+			$("#imageUpload").click();
+		};
+
+
+
+
 
 		chat.$loaded()
 			.then(function(){
@@ -350,17 +460,18 @@ angular.module('rooster.app.controllers', [])
 					});
 			});
 
-		function writeMessageData(chatId, messageId, content, datetime, read, userId) {
+		function writeMessageData(chatId, messageId, content, datetime, read, userId, type) {
 			fb.ref('chats/' + chatId + '/messages/' + messageId).set({
 				content: content,
 				datetime: datetime,
 				read : read,
-				userId : userId
+				userId : userId,
+				type: type
 			});
 			// $state.go('app.rooster');
 		}
 
-		$scope.sendMessage = function () {
+		$scope.sendMessage = function (type, image) {
 			var message = $scope.formData.messageContent;
 			var users = fb.ref('users');
 			var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
@@ -373,10 +484,18 @@ angular.module('rooster.app.controllers', [])
 
 						var allMessages = data.val();
 						var date = new Date();
-						if (allMessages == null) {
-							writeMessageData($stateParams['chatID'], 0, message , date.getTime(), 0, parseInt(userdata[0].$id));
+						if(type == 'text') {
+							if (allMessages == null) {
+								writeMessageData($stateParams['chatID'], 0, message , date.getTime(), 0, parseInt(userdata[0].$id), type);
+							} else {
+								writeMessageData($stateParams['chatID'], allMessages.length, message ,  date.getTime(), 0, parseInt(userdata[0].$id), type);
+							}
 						} else {
-							writeMessageData($stateParams['chatID'], allMessages.length, message ,  date.getTime(), 0, parseInt(userdata[0].$id));
+							if (allMessages == null) {
+								writeMessageData($stateParams['chatID'], 0, image , date.getTime(), 0, parseInt(userdata[0].$id), type);
+							} else {
+								writeMessageData($stateParams['chatID'], allMessages.length, image ,  date.getTime(), 0, parseInt(userdata[0].$id), type);
+							}
 						}
 					});
 				});

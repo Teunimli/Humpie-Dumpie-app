@@ -6,17 +6,27 @@
 	</ion-nav-buttons>
 	<ion-content>
 		<ion-list class="messages">
-			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}">
+			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}" ng-if="message.type == 'text'">
 				<p>{{message.content}}</p>
+				<span class="messageName">{{message.name}}</span>
+				<span class="messageTime">{{message.messageDate}}</span>
+			</ion-item>
+			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}" ng-if="message.type == 'image'">
+				<a download="{{message.name}}_{{message.datetime}}.jpg" href="{{message.content}}" title="{{message.name}}_{{message.datetime}}">
+				<img src="{{message.content}}" alt="image" class="messageImg">
+				</a>
 				<span class="messageName">{{message.name}}</span>
 				<span class="messageTime">{{message.messageDate}}</span>
 			</ion-item>
 		</ion-list>
 	</ion-content>
 	<ion-footer-bar>
-		<form ng-submit="sendMessage()" class="messageForm" novalidate>
+		<form ng-submit="sendMessage('text', '')" class="messageForm" novalidate>
 			<input type="text" name="messageContent" ng-model="formData.messageContent">
 			<button>send</button>
 		</form>
+		<button class="button icon-left ion-android-attach" ng-click="openUpload()"><i class="ion-android-attach"></i></button>
+		<input type="file" name="image" accept="image/*" id="imageUpload" onchange="angular.element(this).scope().imageUpload(this)" ng-model="formData.image">
+
 	</ion-footer-bar>
 </ion-view>

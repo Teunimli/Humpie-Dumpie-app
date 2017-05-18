@@ -1,14 +1,12 @@
 /* Empty. Add your own CSS if you like */
 
 .other {
-    width: 50%;
     float: left;
     margin-right: 50%;
     margin-bottom: 20px;
     white-space: normal;
 }
 .self {
-    width: 50%;
     float: right;
     margin-bottom: 20px;
     white-space: normal;
@@ -140,4 +138,11 @@ ion-tabs .tab-item {
 }
 .rejectedAbsence {
     background: #ff3b30;
+}
+
+.uploadForm input[type=file] {
+    display: none;
+}
+#imageUpload {
+    display: none;
 }
