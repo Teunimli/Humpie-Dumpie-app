@@ -1,0 +1,148 @@
+/* Empty. Add your own CSS if you like */
+
+.other {
+    float: left;
+    margin-right: 50%;
+    margin-bottom: 20px;
+    white-space: normal;
+}
+.self {
+    float: right;
+    margin-bottom: 20px;
+    white-space: normal;
+}
+
+/* zorgt voor kruisje naast de naam */
+.flex-row{
+    display: flex;
+    flex-direction: row;
+}
+
+/* zorgt voor kruisje helemaal rechts van het veld*/
+.flex-between{
+    display: flex;
+    justify-content: space-between;
+}
+
+i.delete {
+    color: red;
+}
+.messageForm {
+    width: 100%;
+}
+.messageForm input[type=text] {
+    display: inline-block;
+    width: 75%;
+}
+.messageForm button {
+    width: 20%;
+}
+.messages p {
+    white-space: normal;
+    font-weight: bold;
+}
+.messages .messageName, .messages .messageTime {
+    font-size: 13px;
+
+}
+
+.app-logo {
+    width: 60%;
+    margin: 0 auto;
+    display: block;
+}
+
+
+.form.lessonFrom{
+    margin-top: 100px;
+}
+
+h4{
+    margin-top: 20px;
+}
+
+.menu-logo {
+    height: 100%;
+    margin: 0 auto;
+    display: block;
+}
+
+
+/* ROOSTER OVERZICHT*/
+
+.times {
+    float: right;
+    width: 17%;
+}
+.times ion-item {
+    font-size: 12px;
+}
+
+.lessons ion-item {
+    height: 54px;
+    border: 0;
+    padding: 0;
+}
+.lessons ion-item .lessonContent {
+    padding: 5px;
+}
+
+.lessonActive {
+    width: 100%;
+    height: 100%;
+    background: #8cb2ec;
+}
+
+.lesson {
+    float: left;
+    background-color: #0a9dc7;
+    width: 83%;
+    height: 53px;
+}
+.lesson2 {
+    background-color: #3355f4;
+    height: 106px;
+    margin-top: 53px;
+}
+
+.bar.bar-dark {
+    background-image: none;
+    background-color: #8cb2ec;
+
+}
+.lesson_single-view .buttons {
+    margin-top: 25%;
+}
+
+.class_select {
+    width: 100%;
+}
+
+.rooster-view ion-content {
+    top: 92px;
+}
+
+.classes_details_view ion-content{
+    top: 92px;
+}
+
+.second_tab{
+    top: 49px;
+}
+
+ion-tabs .tab-item {
+    background: #6ca6ff !important;
+}
+.approvedAbsence, .ispresent {
+    background: #71ff55;
+}
+.rejectedAbsence {
+    background: #ff3b30;
+}
+
+.uploadForm input[type=file] {
+    display: none;
+}
+#imageUpload {
+    display: none;
+}

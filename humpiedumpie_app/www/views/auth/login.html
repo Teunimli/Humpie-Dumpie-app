@@ -1,0 +1,27 @@
+<ion-view class="welcome-view" cache-view="false">
+    <ion-content scroll="false">
+        <div class="top-content row hide-on-keyboard-open">
+            <div class="app-copy col col-center">
+                <img class="app-logo" ng-src="{{logo}}">
+            </div>
+        </div>
+        <div class="row form-wrapper">
+            <div class="col">
+                <form name="login_form" class="" ng-submit="doLogIn()" novalidate>
+                    <div class="form-fields-outer list list-inset">
+                        <label class="item item-input">
+                            <input type="text" placeholder="Gebruikersnaam" name="username" ng-model="data.username" required>
+                        </label>
+                        <label class="item item-input" show-hide-container>
+                            <input type="password" placeholder="Wachtwoord" name="password" ng-model="data.password" required show-hide-input>
+                        </label>
+                        <button type="submit" class="login button button-block button-positive">
+                            Inloggen
+                        </button>
+                        <p ng-show="error" class="message error ">{{error}}</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </ion-content>
+</ion-view>

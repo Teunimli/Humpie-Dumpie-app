@@ -1,0 +1,64 @@
+<ion-view class="add_child-view">
+
+    <ion-nav-title>Kind toevoegen</ion-nav-title>
+    <ion-content>
+
+        <div class="row form-wrapper">
+            <div class="col">
+                <form name="childadd_form" class="childaddFrom" ng-submit="doChildAdd()" novalidate>
+                    <ion-list class=" list ">
+
+                        <h4>Naam</h4>
+                        <label class="item item-input">
+                            <input type="text" name="name" ng-model="formData.name" required>
+                        </label>
+
+                        <h4>Geboorte Datum</h4>
+                        <ion-list>
+                            <div class="item" ion-datetime-picker ng-model="formData.date_of_birth">
+                                {{formData.date_of_birth| date: "dd-MM-yyyy"}}
+                            </div>
+                        </ion-list>
+
+                        <h4>Email </h4>
+                        <label class="item item-input">
+                            <input type="email" name="email" ng-model="formData.email" required>
+                        </label>
+
+                        <h4>Telefoon nummer</h4>
+                        <label class="item item-input">
+                            <input type="text" name="phonenumber" ng-model="formData.phonenumber" required>
+                        </label>
+
+                        <h4>Tweede Telefoon nummer</h4>
+                        <label class="item item-input">
+                            <input type="text" name="second_phonenumber" ng-model="formData.second_phonenumber" >
+                        </label>
+
+                        <h4>Dokter Telefoon nummer</h4>
+                        <label class="item item-input">
+                            <input type="text" name="docter_phonenumber" ng-model="formData.docter_phonenumber" required>
+                        </label>
+
+                        <h4>Huisarts Telefoon nummer</h4>
+                        <label class="item item-input">
+                            <input type="text" name="homedocter_phonenumber" ng-model="formData.homedocter_phonenumber">
+                        </label>
+
+                        <h4>Bijzonderheden</h4>
+                        <label class="item item-input">
+                            <textarea rows='8' name="peculiarities" ng-model="formData.peculiarities"></textarea>
+                        </label>
+
+                        <button type="submit" class="login button button-block button-positive">
+                            Toevoegen
+                        </button>
+                        <p ng-show="error" class="message error">{{error}}</p>
+                    </ion-list>
+                </form>
+            </div>
+        </div>
+
+    </ion-content>
+
+</ion-view>

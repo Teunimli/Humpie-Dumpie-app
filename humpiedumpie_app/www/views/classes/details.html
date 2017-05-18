@@ -1,0 +1,160 @@
+<ion-view class="classes_details_view">
+
+    <ion-nav-title>{{title}}</ion-nav-title>
+
+    <ion-tabs class="tabs-positive">
+
+        <ion-tab title="Lessen">
+            <ion-tabs class="tabs-positive second_tab">
+
+                <ion-tab title="Maandag">
+                    <ion-content>
+                        <ion-list class="times">
+                            <ion-item ng-repeat="time in times" >
+                                {{time}}
+                            </ion-item>
+                        </ion-list>
+
+                        <ion-list class="lessons">
+                            <ion-item ng-repeat="lesson in lessonsMonday">
+                                <div ng-if="lesson.hasLesson == true" class="lessonActive">
+                                    <form name="login_form" class="" ng-submit="goToSingleLesson()" novalidate>
+                                        <div class="lessonContent" ng-click="goToSingleLesson(lesson.ID)">
+                                            <b>{{lesson.title}}</b>
+                                            <p>{{lesson.description}}</p>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                            </ion-item>
+                        </ion-list>
+
+
+                    </ion-content>
+                </ion-tab>
+
+                <ion-tab title="Dinsdag" >
+                    <ion-content>
+                        <ion-list class="times">
+                            <ion-item ng-repeat="time in times" >
+                                {{time}}
+                            </ion-item>
+                        </ion-list>
+
+                        <ion-list class="lessons">
+                            <ion-item ng-repeat="lesson in lessonsTuesday">
+                                <div ng-if="lesson.hasLesson == true" class="lessonActive">
+                                    <form name="login_form" class="" ng-submit="goToSingleLesson()" novalidate>
+                                        <div class="lessonContent" ng-click="goToSingleLesson(lesson.ID)">
+                                            <b>{{lesson.title}}</b>
+                                            <p>{{lesson.description}}</p>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                            </ion-item>
+                        </ion-list>
+
+
+                    </ion-content>
+                </ion-tab>
+
+                <ion-tab title="Woensdag">
+                    <ion-content>
+                        <ion-list class="times">
+                            <ion-item ng-repeat="time in times" >
+                                {{time}}
+                            </ion-item>
+                        </ion-list>
+
+                        <ion-list class="lessons">
+                            <ion-item ng-repeat="lesson in lessonsWednesday">
+                                <div ng-if="lesson.hasLesson == true" class="lessonActive">
+                                    <form name="login_form" class="" ng-submit="goToSingleLesson()" novalidate>
+                                        <div class="lessonContent" ng-click="goToSingleLesson(lesson.ID)">
+                                            <b>{{lesson.title}}</b>
+                                            <p>{{lesson.description}}</p>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                            </ion-item>
+                        </ion-list>
+
+
+                    </ion-content>
+                </ion-tab>
+                <ion-tab title="Donderdag">
+                    <ion-content>
+                        <ion-list class="times">
+                            <ion-item ng-repeat="time in times" >
+                                {{time}}
+                            </ion-item>
+                        </ion-list>
+
+                        <ion-list class="lessons">
+                            <ion-item ng-repeat="lesson in lessonsThursday">
+                                <div ng-if="lesson.hasLesson == true" class="lessonActive">
+                                    <form name="login_form" class="" ng-submit="goToSingleLesson()" novalidate>
+                                        <div class="lessonContent" ng-click="goToSingleLesson(lesson.ID)">
+                                            <b>{{lesson.title}}</b>
+                                            <p>{{lesson.description}}</p>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                            </ion-item>
+                        </ion-list>
+
+
+                    </ion-content>
+                </ion-tab>
+                <ion-tab title="Vrijdag">
+                    <ion-content>
+                        <ion-list class="times">
+                            <ion-item ng-repeat="time in times" >
+                                {{time}}
+                            </ion-item>
+                        </ion-list>
+
+                        <ion-list class="lessons">
+                            <ion-item ng-repeat="lesson in lessonsFriday">
+                                <div ng-if="lesson.hasLesson == true" class="lessonActive">
+                                    <form name="login_form" class="" ng-submit="goToSingleLesson()" novalidate>
+                                        <div class="lessonContent" ng-click="goToSingleLesson(lesson.ID)">
+                                            <b>{{lesson.title}}</b>
+                                            <p>{{lesson.description}}</p>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                            </ion-item>
+                        </ion-list>
+
+
+                    </ion-content>
+                </ion-tab>
+
+            </ion-tabs>
+        </ion-tab>
+
+
+
+        <ion-tab title="Leerlingen" >
+            <ion-content>
+
+                <ion-list class="leerlingen">
+                    <ion-item ng-repeat="user in allUsers">
+                            <b>{{user.name}}</b>
+                            <p>{{user.email}}</p>
+                    </ion-item>
+                </ion-list>
+            </ion-content>
+        </ion-tab>
+    </ion-tabs>
+</ion-view>
