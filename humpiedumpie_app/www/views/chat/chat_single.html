@@ -5,20 +5,14 @@
 		<button class="button button-dark ion-plus-round" ui-sref="app.lesson_add" ng-if="canAdd"></button>
 	</ion-nav-buttons>
 	<ion-content>
+		<div class="loader"></div>
 		<ion-list class="messages">
-			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}" ng-if="message.type == 'text'">
-				<p>{{message.content}}</p>
+			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}" >
+				<p ng-if="message.type == 'text'">{{message.content}}</p>
+				<img ng-if="message.type == 'image'" src="{{message.content}}" alt="image" class="messageImg">
 				<span class="messageName">{{message.name}}</span>
 				<span class="messageTime">{{message.messageDate}}</span>
 			</ion-item>
-			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}" ng-if="message.type == 'image'">
-				<a download="{{message.name}}_{{message.datetime}}.jpg" href="{{message.content}}" title="{{message.name}}_{{message.datetime}}">
-				<img src="{{message.content}}" alt="image" class="messageImg">
-				</a>
-				<span class="messageName">{{message.name}}</span>
-				<span class="messageTime">{{message.messageDate}}</span>
-			</ion-item>
-		</ion-list>
 	</ion-content>
 	<ion-footer-bar>
 		<form ng-submit="sendMessage('text', '')" class="messageForm" novalidate>

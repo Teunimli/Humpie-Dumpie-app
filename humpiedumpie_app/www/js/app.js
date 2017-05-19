@@ -9,6 +9,7 @@ angular.module('humpieDumpie', [
     'humpieDumpie.app.services',
     'humpieDumpie.app.controllers',
     'ion-datetime-picker',
+	'ngCordova'
 ])
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {

@@ -451,17 +451,15 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
 	})
 
-	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicScrollDelegate) {
+
 		var fb = firebase.database();
 		var chatid = $stateParams['chatID'];
 		var chats = fb.ref('chats/' + chatid);
 		var chat = $firebaseArray(chats);
 		$scope.formData = {};
-		console.log('test');
 
 
-		var img = fb.ref('images');
-		$scope.imgs = $firebaseArray(img);
 
 		var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
 
@@ -503,26 +501,10 @@ angular.module('humpieDumpie.app.controllers', [])
 
 
 
-			// var storageRef = firebase.storage().ref();
-			// var image = ele.files[0].name;
-			// var reader = new FileReader();
-			// reader.onload = function () {
-			// 	var imageRef = storageRef.child(ele.files[0].name);
-			// 	var mountainImagesRef = storageRef.child('images/' + ele.files[0].name);
-			// 	$scope.fileContent = reader.result;
-			// 	$scope.$apply();
-			// };
-			// reader.readAsText(ele.files[0]);
-			//
-			// console.log(image);
-
-
 		};
 		$scope.openUpload = function() {
 			$("#imageUpload").click();
 		};
-
-
 
 
 
@@ -534,7 +516,6 @@ angular.module('humpieDumpie.app.controllers', [])
 
 						var messageDate = new Date(chatdata.datetime);
 						chatdata.messageDate = messageDate.getDate() + '-' + messageDate.getMonth() + '-' + messageDate.getFullYear() + ' ' + messageDate.getHours() + ':' + messageDate.getMinutes();
-
 						var users = fb.ref("users/" + chatdata.userId);
 						var user = $firebaseArray(users);
 						user.$loaded()
@@ -565,6 +546,8 @@ angular.module('humpieDumpie.app.controllers', [])
 
 							});
 					});
+					$('.loader').hide();
+				$ionicScrollDelegate.scrollBottom();
 			});
 
 		function writeMessageData(chatId, messageId, content, datetime, read, userId, type) {
