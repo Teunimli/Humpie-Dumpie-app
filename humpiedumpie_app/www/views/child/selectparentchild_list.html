@@ -1,0 +1,27 @@
+<ion-view class="link_child-view">
+
+    <ion-nav-title>{{title}}</ion-nav-title>
+    <ion-content>
+
+    <div class="row form-wrapper">
+        <div class="col">
+
+            <h4>Koppel het kind aan de ouder</h4>
+            <ion-list class="link_child_list">
+                <ion-item ng-repeat="child in allChilds">
+                    <div class="childContent">
+                        <ion-checkbox ng-model="isChecked" ng-change="checkedOrNot(child, isChecked, $index)" ng-init="isChecked=false">{{child.name}}</ion-checkbox>
+                    </div>
+                </ion-item>
+            </ion-list>
+
+            <button type="submit" class="login button button-block button-positive" ng-click="linkChildChild()">
+                Koppelen
+            </button>
+            <p ng-show="error" class="message error">{{error}}</p>
+        </div>
+    </div>
+
+    </ion-content>
+
+</ion-view>

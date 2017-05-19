@@ -210,8 +210,6 @@ angular.module('humpieDumpie.app.controllers', [])
 		var fireRef = Childs.orderByChild('isDeleted').equalTo(0);
 		$scope.allChilds = $firebaseArray(fireRef);
 
-
-
 		$scope.addGroupDate = function(){
 			var date = $scope.formData.date.getTime();
 
@@ -311,8 +309,52 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	.controller('GroupChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
+		$scope.isChecked = false;
+		$scope.selected = [];
+		$scope.childdata = [];
+		$scope.childdetaildata = {};
 
-		
+		var id = $stateParams.id;
+		var group = fb.ref("groups/" + id);
+
+		group.once('value', function (data) {
+			$scope.date = data.val().date;
+
+		});
+
+		var Childs = fb.ref('childs');
+
+		var fireRef = Childs.orderByChild('isDeleted').equalTo(0);
+		$scope.allChilds = $firebaseArray(fireRef);
+
+		$scope.checkedOrNot = function (asset, isChecked, index) {
+			if (isChecked) {
+				$scope.selected.push(asset);
+			} else {
+				var _index = $scope.selected.indexOf(asset);
+				$scope.selected.splice(_index, 1);
+			}
+		};
+
+		$scope.changeGroupChild = function(){
+			angular.forEach($scope.selected, function(group) {
+				$scope.childdetaildata = {
+					id: group.$id,
+					name: group.name,
+					peculiarities : group.peculiarities
+				};
+				$scope.childdata.push($scope.childdetaildata);
+			});
+
+			group.remove();
+			group.set({
+				childs:  $scope.childdata,
+				date: $scope.date
+			});
+			$state.go('app.management');
+		}
+
+
 	})
 
 	.controller('ChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
@@ -744,6 +786,57 @@ angular.module('humpieDumpie.app.controllers', [])
 		console.log('UserTypeListCtrl');
 	})
 
+	.controller('SelectParentCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+
+		var users = fb.ref('users');
+
+		var fireRef = users.orderByChild('role').equalTo('ouder');
+		$scope.allParents = $firebaseArray(fireRef);
+
+	})
+	
+	.controller('SelectParentChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+		$scope.formData = {};
+		$scope.isChecked = false;
+		$scope.selected = [];
+		$scope.childdata = [];
+		$scope.childdetaildata = {};
+
+		var parentid = $stateParams.parentid;
+
+		var childs = fb.ref("childs");
+
+		var fireRef = childs.orderByChild('isDeleted').equalTo(0);
+		$scope.allChilds = $firebaseArray(fireRef);
+
+		$scope.checkedOrNot = function (asset, isChecked, index) {
+			if (isChecked) {
+				$scope.selected.push(asset);
+			} else {
+				var _index = $scope.selected.indexOf(asset);
+				$scope.selected.splice(_index, 1);
+			}
+		};
+
+		$scope.linkChildChild = function() {
+
+			angular.forEach($scope.selected, function (child) {
+				$scope.childdetaildata = {
+					id: child.$id,
+					name: child.name
+				};
+				$scope.childdata.push($scope.childdetaildata);
+			})
+
+			fb.ref('/users/' + parentid ).update({ childs:  $scope.childdata});
+			$state.go('app.management');
+
+		}
+
+	})
+
 	.controller('UserCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		$scope.formData = {};
 		var userType = $stateParams.userType;
@@ -794,7 +887,6 @@ angular.module('humpieDumpie.app.controllers', [])
 				});
 		}
 
-
 		$scope.doUserAdd = function () {
 
 
@@ -828,7 +920,9 @@ angular.module('humpieDumpie.app.controllers', [])
 
 
 						});
-						$state.go('app.users', {userType: userType});
+
+						$state.go('app.management');
+
 					}
 
 				} else {

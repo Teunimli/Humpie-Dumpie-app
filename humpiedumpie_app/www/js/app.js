@@ -246,11 +246,31 @@ angular.module('humpieDumpie', [
 		  })
 
 		  .state('app.changegroupdate', {
-			  url: "/changegroup:date",
+			  url: "/changegroup:id",
 			  views: {
 				  'menuContent': {
 					  templateUrl   : "views/group/change_list.html",
 					  controller: 'GroupChangeChildCtrl'
+				  }
+			  }
+		  })
+
+		  .state('app.selectchild', {
+			  url: "/selectchild",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/child/selectparent_list.html",
+					  controller: 'SelectParentCtrl'
+				  }
+			  }
+		  })
+		  
+		  .state('app.link_child', {
+			  url: "/selectchild:parentid",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/child/selectparentchild_list.html",
+					  controller: 'SelectParentChildCtrl'
 				  }
 			  }
 		  })

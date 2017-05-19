@@ -1,0 +1,16 @@
+<ion-view class="select_parent-view">
+
+    <ion-nav-title>{{title}}</ion-nav-title>
+    <ion-content>
+
+        <ion-list class="select_parent">
+                <ion-item ng-repeat="parent in allParents">
+                    <div class="parentContent" ui-sref="app.link_child({ parentid: parent.$id })">
+                        <p><b>Naam: {{parent.name}}</b></p>
+                    </div>
+                </ion-item>
+        </ion-list>
+
+    </ion-content>
+
+</ion-view>
