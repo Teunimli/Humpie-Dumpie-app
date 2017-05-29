@@ -200,6 +200,59 @@ angular.module('humpieDumpie.app.controllers', [])
 
     })
 
+	.controller('ChildGroupCtrl', function ($scope, $stateParams, $firebaseArray, $state, $filter) {
+		var fb = firebase.database();
+
+		var date = new Date();
+		var newdate = $filter('date')(new Date(date), 'yyyy-MM-dd');
+		var time = Math.round(new Date(newdate).getTime()/1000);
+		var currtime = time - 7200;
+		var realtime = currtime += '000';
+
+		var groups = fb.ref('groups');
+
+		var fireRef = groups.orderByChild('date').equalTo(realtime);
+		var allgroups = $firebaseArray(fireRef);
+
+
+		allgroups.$loaded()
+			.then(function(){
+				angular.forEach(allgroups, function(groups) {
+					var childref = fb.ref('groups/' + groups.$id + '/childs');
+					$scope.childs = $firebaseArray(childref);
+					$scope.groups = groups.$id;
+				})
+			});
+
+
+		$scope.notPresence = function(groupid, id){
+
+			function writeChildData(id, ispresence) {
+				fb.ref('groups/' + groupid + '/childs/' + id).update({
+					isprecence: ispresence
+				});
+			}
+
+			writeChildData(id, 0);
+
+			$state.go('app.group', {}, {reload:true});
+
+		}
+
+	})
+
+	.controller('childDetailCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+		var fb = firebase.database();
+
+		var childID = $stateParams.childId;
+		var child = fb.ref("childs/" + childID);
+		child.once('value', function (data) {
+			$scope.child = data.val();
+		});
+
+
+	})
+
 	.controller('GroupCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
 		var fb = firebase.database();
 		$scope.formData = {};
@@ -237,7 +290,7 @@ angular.module('humpieDumpie.app.controllers', [])
 				}
 
 			});
-			
+
 		};
 
 		$scope.checkedOrNot = function (asset, isChecked, index) {
@@ -287,7 +340,8 @@ angular.module('humpieDumpie.app.controllers', [])
 						$scope.childdetaildata = {
 							id: group.$id,
 							name: group.name,
-							peculiarities : group.peculiarities
+							peculiarities : group.peculiarities,
+							isprecence : 1
 						};
 						$scope.childdata.push($scope.childdetaildata);
 					});

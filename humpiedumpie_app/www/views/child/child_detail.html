@@ -1,0 +1,19 @@
+<ion-view class="child_detail-view">
+    <ion-nav-title>{{title}}</ion-nav-title>
+
+    <ion-content>
+        <ion-item class="group_child_list">
+            <div class="childContent">
+                <p><b>Naam: {{child.name}}</b></p>
+                <p>Geboorte Datum: {{child.date_of_birth| date: "dd-MM-yyyy"}}</p>
+                <p>Bijzonderheden: {{child.peculiarities}}</p>
+                <p>Email: {{child.email}}</p>
+                <p>Telefoon nummer: {{child.phonenumber}}</p>
+                <p>Tweede telefoon nummer: {{child.second_phonenumber}}</p>
+                <p>Dokter telefoon nummer: {{child.docter_phonenumber}}</p>
+                <p>Huisarts telefoon nummer: {{child.homedocter_phonenumber}}</p>
+            </div>
+        </ion-item>
+    </ion-content>
+
+</ion-view>

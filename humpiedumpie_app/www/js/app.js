@@ -51,7 +51,7 @@ angular.module('humpieDumpie', [
 		      views: {
 			      'menuContent': {
 				      templateUrl   : "views/group/group.html",
-				      controller: 'GroupCtrl'
+				      controller: 'ChildGroupCtrl'
 			      }
 		      }
 	      })
@@ -271,6 +271,16 @@ angular.module('humpieDumpie', [
 				  'menuContent': {
 					  templateUrl   : "views/child/selectparentchild_list.html",
 					  controller: 'SelectParentChildCtrl'
+				  }
+			  }
+		  })
+
+		  .state('app.child_detail', {
+			  url: "/child_detail/:childId",
+			  views: {
+				  'menuContent': {
+					  templateUrl   : "views/child/child_detail.html",
+					  controller: 'childDetailCtrl'
 				  }
 			  }
 		  })

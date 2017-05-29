@@ -65,6 +65,9 @@ ion-content {
 i.delete {
     color: red;
 }
+i.confirm {
+    color: blue;
+}
 .messageForm {
     width: 100%;
 }
