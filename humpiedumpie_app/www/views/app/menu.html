@@ -17,6 +17,7 @@
 			<img class="menu-logo" ng-src="{{logo}}">
 		</ion-header-bar>
 		<ion-content>
+
 			<ion-list >
 				<ion-item menu-close ng-repeat="menuitem in menucontent" ng-if="menuitem.type == 'sref'" ui-sref="{{menuitem.action}}">
 					{{ menuitem.title }}

@@ -1,9 +1,6 @@
 <ion-view class="chat-single">
 
 	<ion-nav-title>{{title}}</ion-nav-title>
-	<ion-nav-buttons side="right">
-		<button class="button button-dark ion-plus-round" ui-sref="app.lesson_add" ng-if="canAdd"></button>
-	</ion-nav-buttons>
 	<ion-content>
 		<div class="loader"></div>
 		<ion-list class="messages">
@@ -17,7 +14,7 @@
 	<ion-footer-bar>
 		<form ng-submit="sendMessage('text', '')" class="messageForm" novalidate>
 			<input type="text" name="messageContent" ng-model="formData.messageContent">
-			<button>send</button>
+			<button type="submit">send</button>
 		</form>
 		<button class="button icon-left ion-android-attach" ng-click="openUpload()"><i class="ion-android-attach"></i></button>
 		<input type="file" name="image" accept="image/*" id="imageUpload" onchange="angular.element(this).scope().imageUpload(this)" ng-model="formData.image">

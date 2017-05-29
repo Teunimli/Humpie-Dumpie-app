@@ -57,53 +57,24 @@ angular.module('humpieDumpie.app.controllers', [])
 							];
 							break;
 						case 'ouder':
-							var users = fb.ref('users');
-							var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
-							var userdata = $firebaseArray(fireRef);
-							userdata.$loaded()
-								.then(function () {
-									var userid = parseInt(userdata[0].$id);
-									var chats = fb.ref('chats');
-									var chatRef = chats.orderByChild('parentId').equalTo(userid);
-									var chatdata = $firebaseArray(chatRef);
-									chatdata.$loaded()
-										.then(function () {
-											console.log(chatdata.length);
-											if(chatdata.length > 0) {
-												var chatid = chatdata[0].$id;
 
-												$scope.menucontent = [
-													{
-														title: 'Chat',
-														type: 'click',
-														action: 'goToSingleChat(' + chatid + ')'
-													},
-													{
-														title: 'Absentie',
-														type: 'sref',
-														action: 'app.absence'
-													},
-													{
-														title: 'Uitloggen',
-														type: 'click',
-														action: 'doLogOut()'
-													}
-												];
-											} else {
-												var chats = fb.ref('chats');
-
-												chats.once('value', function (data) {
-
-													var allChats = data.val();
-													if (allChats == null) {
-														writeChatData(0, [], userid);
-													} else {
-														writeChatData(allChats.length, [], userid);
-													}
-												});
-											}
-										});
-								});
+							$scope.menucontent = [
+								{
+									title: 'Chat',
+									type: 'click',
+									action: 'goToSingleChat()'
+								},
+								{
+									title: 'Absentie',
+									type: 'sref',
+									action: 'app.absence'
+								},
+								{
+									title: 'Uitloggen',
+									type: 'click',
+									action: 'doLogOut()'
+								}
+							];
 
 							break;
 						default:
@@ -129,9 +100,42 @@ angular.module('humpieDumpie.app.controllers', [])
 
 		$scope.goToUsers = function (userType) {
 			$state.go('app.users', {userType: userType});
-		}
-		$scope.goToSingleChat = function(chatID) {
-			$state.go('app.singleChat', {"chatID": chatID});
+		};
+		$scope.goToSingleChat = function() {
+			var users = fb.ref('users');
+			var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
+			var userda = $firebaseArray(fireRef);
+			userda.$loaded()
+				.then(function () {
+					var userid = parseInt(userda[0].$id);
+					var chats = fb.ref('chats');
+					var chatRef = chats.orderByChild('parentId').equalTo(userid);
+					var chatdata = $firebaseArray(chatRef);
+					chatdata.$loaded()
+						.then(function () {
+							console.log(chatdata.length);
+							if (chatdata.length > 0) {
+								var chatid = chatdata[0].$id;
+								$state.go('app.singleChat', {"chatID": chatid});
+
+							} else {
+								var chats = fb.ref('chats');
+
+								chats.once('value', function (data) {
+
+									var allChats = data.val();
+									if (allChats == null) {
+										writeChatData(0, [], userid);
+										$state.go('app.singleChat', {"chatID": 0});
+									} else {
+										writeChatData(allChats.length, [], userid);
+										$state.go('app.singleChat', {"chatID": allChats.length});
+									}
+								});
+							}
+						});
+				});
+
 		}
 	})
 
@@ -362,7 +366,7 @@ angular.module('humpieDumpie.app.controllers', [])
 		var fb = firebase.database();
         $scope.formData = {};
 
-		var Childs = fb.ref('childs');
+		var Childs = fb.ref('groups/' + groupid + '/childs');
 
 		var fireRef = Childs.orderByChild('isDeleted').equalTo(0);
 		$scope.allChilds = $firebaseArray(fireRef);
@@ -493,104 +497,99 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
 	})
 
-	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicScrollDelegate) {
+	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicScrollDelegate, $window, $timeout) {
 
 		var fb = firebase.database();
 		var chatid = $stateParams['chatID'];
-		var chats = fb.ref('chats/' + chatid);
-		var chat = $firebaseArray(chats);
-		$scope.formData = {};
-
-
-
-		var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
-
-		$scope.imageUpload = function(ele) {
-
-
-				var sFileName = $("#imageUpload").val();
-				if (sFileName.length > 0) {
-					var blnValid = false;
-					for (var j = 0; j < _validFileExtensions.length; j++) {
-						var sCurExtension = _validFileExtensions[j];
-						if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
-							blnValid = true;
-							var filesSelected = document.getElementById("imageUpload").files;
-							if (filesSelected.length > 0) {
-								var fileToLoad = filesSelected[0];
-
-								var fileReader = new FileReader();
-
-								fileReader.onload = function(fileLoadedEvent) {
-
-
-									$scope.sendMessage('image', fileLoadedEvent.target.result)
-								};
-
-								fileReader.readAsDataURL(fileToLoad);
-							}
-							break;
-						}
-					}
-
-					if (!blnValid) {
-						alert('File is not valid');
-						return false;
-					}
-				}
-
-				return true;
-
-
-
-		};
-		$scope.openUpload = function() {
-			$("#imageUpload").click();
-		};
-
-
-
-		chat.$loaded()
-			.then(function(){
-				$scope.messages = chat[0];
-
-					angular.forEach(chat[0], function (chatdata) {
-
-						var messageDate = new Date(chatdata.datetime);
-						chatdata.messageDate = messageDate.getDate() + '-' + messageDate.getMonth() + '-' + messageDate.getFullYear() + ' ' + messageDate.getHours() + ':' + messageDate.getMinutes();
-						var users = fb.ref("users/" + chatdata.userId);
-						var user = $firebaseArray(users);
-						user.$loaded()
+		var messagesent = false;
+		$scope.sendMessage = function (type, image) {
+			if (!messagesent) {
+				messagesent = true;
+				var message = $scope.formData.messageContent;
+				var users = fb.ref('users');
+				var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
+				var userdata = $firebaseArray(fireRef);
+				userdata.$loaded()
+					.then(function () {
+						var messages = fb.ref('chats/' + $stateParams['chatID'] + '/messages');
+						var messagedata = $firebaseArray(messages);
+						messagedata.$loaded()
 							.then(function () {
-								angular.forEach(user, function (userdata) {
-									if (userdata.$id == 'name') {
+								var date = new Date();
 
-										chatdata.name = userdata.$value;
+								if (type == 'text') {
+									if (messagedata.length <= 0) {
+										writeMessageData($stateParams['chatID'], 0, message, date.getTime(), 0, parseInt(userdata[0].$id), type);
+									} else {
+										writeMessageData($stateParams['chatID'], messagedata.length, message, date.getTime(), 0, parseInt(userdata[0].$id), type);
 									}
-									if (userdata.$id == 'email') {
-										var curuser = firebase.auth().currentUser;
-										var curemail;
-										if (curuser) {
-											curemail = curuser.email;
-										} else {
-											$state.go('login');
-										}
-
-										if (curemail == userdata.$value) {
-											chatdata.self = true;
-										} else {
-											chatdata.self = false;
-										}
-
-
+								} else {
+									if (messagedata.length <= 0) {
+										writeMessageData($stateParams['chatID'], 0, image, date.getTime(), 0, parseInt(userdata[0].$id), type);
+									} else {
+										writeMessageData($stateParams['chatID'], messagedata.length, image, date.getTime(), 0, parseInt(userdata[0].$id), type);
 									}
-								});
-
+								}
+								$state.go($state.current, {}, {reload: true});
 							});
+
 					});
-					$('.loader').hide();
-				$ionicScrollDelegate.scrollBottom();
-			});
+			} else {
+			//
+			}
+
+		};
+
+			var chats = fb.ref('chats/' + chatid);
+			var chat = $firebaseArray(chats);
+			$scope.formData = {};
+
+
+
+			chat.$loaded()
+				.then(function(){
+
+					$timeout(function() {
+						$scope.messages = chat[0];
+
+						angular.forEach(chat[0], function (chatdata) {
+
+							var messageDate = new Date(chatdata.datetime);
+							chatdata.messageDate = messageDate.getDate() + '-' + messageDate.getMonth() + '-' + messageDate.getFullYear() + ' ' + messageDate.getHours() + ':' + messageDate.getMinutes();
+							var users = fb.ref("users/" + chatdata.userId);
+							var user = $firebaseArray(users);
+							user.$loaded()
+								.then(function () {
+									angular.forEach(user, function (userdat) {
+										if (userdat.$id == 'name') {
+
+											chatdata.name = userdat.$value;
+										}
+										if (userdat.$id == 'email') {
+											var curuser = firebase.auth().currentUser;
+											var curemail;
+											if (curuser) {
+												curemail = curuser.email;
+											} else {
+												$state.go('login');
+											}
+
+											if (curemail == userdat.$value) {
+												chatdata.self = true;
+											} else {
+												chatdata.self = false;
+											}
+
+
+										}
+									});
+
+								});
+						});
+						$('.loader').hide();
+						$ionicScrollDelegate.scrollBottom();
+					})
+				});
 
 		function writeMessageData(chatId, messageId, content, datetime, read, userId, type) {
 			fb.ref('chats/' + chatId + '/messages/' + messageId).set({
@@ -603,36 +602,53 @@ angular.module('humpieDumpie.app.controllers', [])
 			// $state.go('app.rooster');
 		}
 
-		$scope.sendMessage = function (type, image) {
-			var message = $scope.formData.messageContent;
-			var users = fb.ref('users');
-			var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
-			var userdata = $firebaseArray(fireRef);
-			userdata.$loaded()
-				.then(function () {
-					var messages = fb.ref('chats/' + $stateParams['chatID'] + '/messages' );
 
-					messages.once('value', function (data) {
 
-						var allMessages = data.val();
-						var date = new Date();
-						if(type == 'text') {
-							if (allMessages == null) {
-								writeMessageData($stateParams['chatID'], 0, message , date.getTime(), 0, parseInt(userdata[0].$id), type);
-							} else {
-								writeMessageData($stateParams['chatID'], allMessages.length, message ,  date.getTime(), 0, parseInt(userdata[0].$id), type);
-							}
-						} else {
-							if (allMessages == null) {
-								writeMessageData($stateParams['chatID'], 0, image , date.getTime(), 0, parseInt(userdata[0].$id), type);
-							} else {
-								writeMessageData($stateParams['chatID'], allMessages.length, image ,  date.getTime(), 0, parseInt(userdata[0].$id), type);
-							}
+
+		var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".gif", ".png"];
+		$(".ion-android-attach").click(function () {
+			$scope.imageUpload();
+		});
+		$scope.imageUpload = function(ele) {
+
+
+			var sFileName = $("#imageUpload").val();
+			if (sFileName.length > 0) {
+				var blnValid = false;
+				for (var j = 0; j < _validFileExtensions.length; j++) {
+					var sCurExtension = _validFileExtensions[j];
+					if (sFileName.substr(sFileName.length - sCurExtension.length, sCurExtension.length).toLowerCase() == sCurExtension.toLowerCase()) {
+						blnValid = true;
+						var filesSelected = document.getElementById("imageUpload").files;
+						if (filesSelected.length > 0) {
+							var fileToLoad = filesSelected[0];
+
+							var fileReader = new FileReader();
+
+							fileReader.onload = function(fileLoadedEvent) {
+
+								$scope.sendMessage('image', fileLoadedEvent.target.result)
+							};
+
+							fileReader.readAsDataURL(fileToLoad);
 						}
-					});
-				});
+						break;
+					}
+				}
+
+				if (!blnValid) {
+					alert('File is not valid');
+					return false;
+				}
+			}
+
+			return true;
 
 
+
+		};
+		$scope.openUpload = function() {
+			$("#imageUpload").click();
 		};
 	})
 

@@ -2,18 +2,34 @@
 .messageImg {
     width: 100%;
 }
+.bar-dark {
+    background: #de3f3f;
+}
 .other {
     float: left;
     margin-right: 50%;
     margin-bottom: 20px;
     white-space: normal;
     width: 75%;
+    background: #009fff;
+    color: white;
+}
+.other p {
+    color: white;
+}
+ion-content {
+    background: #ffc900;
 }
 .self {
     float: right;
     margin-bottom: 20px;
     white-space: normal;
     width: 75%;
+    background: #009fff;
+    color: white;
+}
+.self p {
+    color: white;
 }
 /*Loader*/
 .loader {
@@ -129,7 +145,7 @@ h4{
 
 .bar.bar-dark {
     background-image: none;
-    background-color: #8cb2ec;
+    background-color: #de3f3f;
 
 }
 .lesson_single-view .buttons {
@@ -167,4 +183,14 @@ ion-tabs .tab-item {
 }
 #imageUpload {
     display: none;
+}
+ion-side-menu ion-item, ion-side-menu ion-item a {
+    background-color: #de3f3f !important;
+}
+ion-side-menu ion-content {
+    background: #de3f3f;
+}
+.button.button-block, .button.button-full {
+    margin-bottom: 0;
+    margin-top: 0;
 }
