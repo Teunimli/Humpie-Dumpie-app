@@ -1,10 +1,11 @@
 <ion-view class="group_child-view">
-	<ion-nav-title>{{title}}</ion-nav-title>
+	<ion-nav-title>Groep</ion-nav-title>
 
 	<ion-content>
 		<ion-list class="group_child_list">
 			<ion-item ng-repeat="child in childs">
 				<div class="childContent" ng-if="child.isprecence == 1" ui-sref="app.child_detail({ childId: child.id })">
+
 					<p><b>Naam: {{child.name}}</b></p>
 					<p>Bijzonderheden: {{child.peculiarities}}</p>
 				</div>

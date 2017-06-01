@@ -19,12 +19,12 @@
 						</label>
 						<h4>Wachtwoord {{userType}}</h4>
 						<label class="item item-input">
-							<input type="text" name="password" ng-model="formData.password" required>
+							<input type="password" name="password" ng-model="formData.password" required>
 						</label>
 						<div class="repeatPassword">
 							<h4>Voer uw eigen wachtwoord in</h4>
 							<label class="item item-input">
-								<input type="password" name="currentUserPassword" ng-model="formData.currentUserPassword">
+								<input type="password" name="currentUserPassword" ng-model="formData.currentUserPassword" required>
 							</label>
 						</div>
 						<button type="submit" class="login button button-block button-positive">

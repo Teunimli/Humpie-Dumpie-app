@@ -1,0 +1,14 @@
+<ion-view class="child_detail-view">
+	<ion-nav-title>afwezigheid</ion-nav-title>
+
+	<ion-content>
+		<ion-list class="absence">
+			<ion-item ng-repeat="absence in allAbsence" >
+				<p>Reden: {{absence.reason}}</p>
+				<p>Soort: {{absence.kind}}</p>
+				<p>Datum: {{absence.date | date: "dd-MM-yyyy"}}</p>
+			</ion-item>
+		</ion-list>
+	</ion-content>
+
+</ion-view>

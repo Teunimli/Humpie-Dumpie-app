@@ -45,13 +45,48 @@ angular.module('humpieDumpie', [
             templateUrl: "views/auth/login.html",
             controller: 'AuthCtrl'
           })
-          
+	      .state('app.parentHome', {
+		      url: "/home",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/parentHome/parentHome.html",
+				      controller: 'parentHomeCtrl'
+			      }
+		      }
+	      })
+	      .state('app.childAbsence', {
+		      url: "/childAbsence/:childId",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/child/child_absence.html",
+				      controller: 'ChildAbsence'
+			      }
+		      }
+	      })
 	      .state('app.group', {
 		      url: "/group",
 		      views: {
 			      'menuContent': {
 				      templateUrl   : "views/group/group.html",
 				      controller: 'ChildGroupCtrl'
+			      }
+		      }
+	      })
+	      .state('app.absence', {
+		      url: "/absence",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/absence/overview.html",
+				      controller: 'AbsenceCtrl'
+			      }
+		      }
+	      })
+	      .state('app.absence_add', {
+		      url: "/absence_add",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/absence/absence_add.html",
+				      controller: 'AbsenceCtrl'
 			      }
 		      }
 	      })

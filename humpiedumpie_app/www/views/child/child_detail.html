@@ -1,5 +1,5 @@
 <ion-view class="child_detail-view">
-    <ion-nav-title>{{title}}</ion-nav-title>
+    <ion-nav-title>{{child.name}}</ion-nav-title>
 
     <ion-content>
         <ion-item class="group_child_list">
@@ -12,6 +12,11 @@
                 <p>Tweede telefoon nummer: {{child.second_phonenumber}}</p>
                 <p>Dokter telefoon nummer: {{child.docter_phonenumber}}</p>
                 <p>Huisarts telefoon nummer: {{child.homedocter_phonenumber}}</p>
+                <br>
+                <button ui-sref="app.childAbsence({ childId: child.id })" class="button button-block button-positive">
+                    Afwezigheid
+                </button>
+
             </div>
         </ion-item>
     </ion-content>

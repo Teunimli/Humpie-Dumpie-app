@@ -1,19 +1,17 @@
 <ion-view class="absence-view">
 	<ion-nav-title>Absentie</ion-nav-title>
 	<ion-nav-buttons side="right">
-		<button class="button button-dark ion-plus-round" ui-sref="app.absense_add" ng-if="canAdd"></button>
+		<button class="button button-dark ion-plus-round" ui-sref="app.absence_add"></button>
 	</ion-nav-buttons>
 
 	<ion-content>
 		<ion-list class="absence">
-			<ion-item ng-repeat="absence in allAbsence" ng-class="{approvedAbsence: absence.approved == 1, pendingAbsence: absence.approved == 0 && absence.viewed == 0, rejectedAbsence: absence.approved == 0 && absence.viewed == 1}">
-				<div class="absenceContent" ui-sref="app.absencedetails({ absenceId: absence.$id })">
-					<p><b>Naam: {{absence.displayname}}</b></p>
-					<p><b>Email: {{absence.email}}</b></p>
-					<p><b>Reden: {{absence.reson}}</b></p>
-					<p>Beschrijving: {{absence.description}}</p>
-					<p>Begin datum: {{absence.begin_date |  date:'d MMMM yyyy H:mm:ss'}}</p>
-					<p>Eind datum: {{absence.end_date |  date:'d MMMM yyyy H:mm:ss'}}</p>
+			<ion-item ng-repeat="absence in allAbsence" >
+				<div class="absenceContent">
+					<p><b>Reden: {{absence.reason}}</b></p>
+					<p><b>Soort: {{absence.kind}}</b></p>
+					<p>Datum: {{absence.date | date: "dd-MM-yyyy"}}</p>
+					<i class="ion-close" style="float: right" ng-click="doAbsenceRemove(absence.$id)"></i>
 				</div>
 			</ion-item>
 		</ion-list>

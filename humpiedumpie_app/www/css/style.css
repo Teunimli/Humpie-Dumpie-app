@@ -5,32 +5,11 @@
 .bar-dark {
     background: #de3f3f;
 }
-.other {
-    float: left;
-    margin-right: 50%;
-    margin-bottom: 20px;
-    white-space: normal;
-    width: 75%;
-    background: #009fff;
-    color: white;
-}
-.other p {
-    color: white;
-}
-ion-content {
+
+ion-content, .innerabsenceform, .form-fields-outer {
     background: #ffc900;
 }
-.self {
-    float: right;
-    margin-bottom: 20px;
-    white-space: normal;
-    width: 75%;
-    background: #009fff;
-    color: white;
-}
-.self p {
-    color: white;
-}
+
 /*Loader*/
 .loader {
     border: 16px solid #f3f3f3; /* Light grey */
@@ -63,7 +42,8 @@ ion-content {
 }
 
 i.delete {
-    color: red;
+    color: black;
+    float: right;
 }
 i.confirm {
     color: blue;
@@ -187,8 +167,13 @@ ion-tabs .tab-item {
 #imageUpload {
     display: none;
 }
+ion-item, ion-item a {
+    background-color: #de3f3f!important;
+    color: white !important;
+}
 ion-side-menu ion-item, ion-side-menu ion-item a {
     background-color: #de3f3f !important;
+    color: white !important;
 }
 ion-side-menu ion-content {
     background: #de3f3f;
@@ -196,4 +181,33 @@ ion-side-menu ion-content {
 .button.button-block, .button.button-full {
     margin-bottom: 0;
     margin-top: 0;
+}
+.self {
+    float: right;
+    margin-bottom: 20px;
+    white-space: normal;
+    width: 75%;
+    background-color: #009fff !important;
+    color: white;
+}
+.self p {
+    color: white;
+}
+.other {
+    float: left;
+    margin-right: 50%;
+    margin-bottom: 20px;
+    white-space: normal;
+    width: 75%;
+    background-color: #009fff !important;
+    color: white;
+}
+.other p {
+    color: white;
+}
+.item-content h2 {
+    color: white;
+}
+.item p {
+    color: white;
 }
