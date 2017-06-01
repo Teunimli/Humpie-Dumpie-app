@@ -1,0 +1,72 @@
+{
+  "absence" : [ {
+    "childId" : "3",
+    "date" : "1496008800000",
+    "email" : "ouder@ouder.nl",
+    "kind" : "Ziek",
+    "reason" : "testje"
+  } ],
+  "chats" : [ {
+    "messages" : [ {
+      "content" : "bericht 1",
+      "datetime" : 1494834367659,
+      "read" : 0,
+      "userId" : 1
+    }, {
+      "content" : "hoi",
+      "datetime" : 1495097857466,
+      "read" : 0,
+      "type" : "text",
+      "userId" : 1
+    } ],
+    "parentId" : 1
+  } ],
+  "childs" : [ {
+    "date_of_birth" : 1494492360000,
+    "docter_phonenumber" : "46468468",
+    "email" : "dwadwa@wadw.nl",
+    "homedocter_phonenumber" : "864686",
+    "isDeleted" : 1,
+    "name" : "dwadw",
+    "peculiarities" : "ujicni",
+    "phonenumber" : "8656846846",
+    "second_phonenumber" : "846864"
+  } ],
+  "groups" : [ {
+      "childs" : [ {
+      "id" : "3",
+      "isprecence" : 0,
+      "name" : "wadawd",
+      "peculiarities" : "46"
+    }, {
+      "id" : "4",
+      "isprecence" : 1,
+      "name" : "wdawd",
+      "peculiarities" : "kjfbewi"
+    } ],
+    "date" : "1495490400000"
+  }, {
+    "childs" : [ {
+      "id" : "3",
+      "isprecence" : 0,
+      "name" : "wadawd",
+      "peculiarities" : "46"
+    }, {
+      "id" : "4",
+      "isprecence" : 1,
+      "name" : "wdawd",
+      "peculiarities" : "kjfbewi"
+    } ],
+    "date" : "1496008800000"
+  } ],
+  "users" : [ {
+    "childs" : [ {
+      "id" : "3",
+      "name" : "wadawd"
+    } ],
+    "class" : "",
+    "email" : "ouder@ouder.nl",
+    "name" : "ouder",
+    "role" : "ouder"
+  } ]
+}
