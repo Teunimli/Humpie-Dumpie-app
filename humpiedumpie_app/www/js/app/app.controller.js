@@ -15,15 +15,6 @@ angular.module('humpieDumpie.app.controllers', [])
 
 
 
-
-		// Functie om een chat aan te maken
-		function writeChatData(chatId, messages, parentId) {
-			fb.ref('chats/' + chatId).set({
-				messages: messages,
-				parentId: parentId
-			});
-		}
-
 				var role = window.localStorage.getItem('role');
 				switch (role) {
 					case 'leidster':
@@ -106,25 +97,7 @@ angular.module('humpieDumpie.app.controllers', [])
 					var chatdata = $firebaseArray(chatRef);
 					chatdata.$loaded()
 						.then(function () {
-							if (chatdata.length > 0) {
-								var chatid = chatdata[0].$id;
-								$state.go('app.singleChat', {"chatID": chatid});
-
-							} else {
-								var chats = fb.ref('chats');
-
-								chats.once('value', function (data) {
-
-									var allChats = data.val();
-									if (allChats == null) {
-										writeChatData(0, [], userid);
-										$state.go('app.singleChat', {"chatID": 0});
-									} else {
-										writeChatData(allChats.length, [], userid);
-										$state.go('app.singleChat', {"chatID": allChats.length});
-									}
-								});
-							}
+							$state.go('app.singleChat', {"chatID": chatdata[0].$id});
 						});
 				});
 
@@ -219,31 +192,38 @@ angular.module('humpieDumpie.app.controllers', [])
     })
 
 	.controller('ChildGroupCtrl', function ($scope, $stateParams, $firebaseArray, $state, $filter, $ionicHistory) {
-		// firebase object aanmaken
-		var fb = firebase.database();
 
-		// timestamp aanmaken voor de datum zonder tijd
-		var date = new Date();
-		var newdate = $filter('date')(new Date(date), 'yyyy-MM-dd');
-		var time = Math.round(new Date(newdate).getTime()/1000);
-		var currtime = time - 7200;
-		var realtime = currtime += '000';
+		$scope.doRefresh = function () {
+			init();
+			$scope.$broadcast('scroll.refreshComplete');
+		};
+		init();
+		function init() {
+			// firebase object aanmaken
+			var fb = firebase.database();
 
-		var groups = fb.ref('groups');
-		// de groep ophalen die gelijk staat aan de huidige datum
-		var fireRef = groups.orderByChild('date').equalTo(realtime);
-		var allgroups = $firebaseArray(fireRef);
+			// timestamp aanmaken voor de datum zonder tijd
+			var date = new Date();
+			var newdate = $filter('date')(new Date(date), 'yyyy-MM-dd');
+			var time = Math.round(new Date(newdate).getTime() / 1000);
+			var currtime = time - 7200;
+			var realtime = currtime += '000';
+
+			var groups = fb.ref('groups');
+			// de groep ophalen die gelijk staat aan de huidige datum
+			var fireRef = groups.orderByChild('date').equalTo(realtime);
+			var allgroups = $firebaseArray(fireRef);
 
 
-		allgroups.$loaded()
-			.then(function(){
-				angular.forEach(allgroups, function(groups) {
-					var childref = fb.ref('groups/' + groups.$id + '/childs');
-					$scope.childs = $firebaseArray(childref);
-					$scope.groups = groups.$id;
-				})
-			});
-
+			allgroups.$loaded()
+				.then(function () {
+					angular.forEach(allgroups, function (groups) {
+						var childref = fb.ref('groups/' + groups.$id + '/childs');
+						$scope.childs = $firebaseArray(childref);
+						$scope.groups = groups.$id;
+					})
+				});
+		}
 
 		$scope.notPresence = function(groupid, id){
 
@@ -530,9 +510,7 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
 
 		$scope.doChildUpdate = function(){
-			var date_of_birth = $scope.formData.date_of_birth.getTime();
-
-			writeChildData(childID, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
+			writeChildData(childID, $scope.formData.name, $scope.formData.date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
 			var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
 			$ionicHistory.viewHistory().forcedNav = {
 				viewId:     backView.viewId,
@@ -571,6 +549,11 @@ angular.module('humpieDumpie.app.controllers', [])
 		allChats.$loaded()
 			.then(function(){
 				angular.forEach(allChats, function(chat) {
+					if(chat.lastsend != firebase.auth().currentUser.email && chat.read == 0) {
+						chat.dobold = true;
+					} else {
+						chat.dobold = false;
+					}
 					var parent = fb.ref("users/" + chat.parentId);
 					var parents = $firebaseArray(parent);
 
@@ -645,58 +628,61 @@ angular.module('humpieDumpie.app.controllers', [])
 		};
 
 			var chats = fb.ref('chats/' + chatid);
-			var chat = $firebaseArray(chats);
+			//var chat = $firebaseArray(chats);
 			$scope.formData = {};
 
 
+			chats.on('value', function (data) {
+				var chat = data.val();
+				$scope.messages = chat.messages;
+				if(chat.lastsend != firebase.auth().currentUser.email) {
+					fb.ref('chats/' + chatid).update({
+						lastsend: firebase.auth().currentUser.email,
+						read: 0
+					});
+				}
 
-			chat.$loaded()
-				.then(function(){
+				angular.forEach(chat.messages, function (chatdata, key) {
 
-					$timeout(function() {
-						$scope.messages = chat[0];
+					var messageDate = new Date(chatdata.datetime);
+					chatdata.messageDate = messageDate.getDate() + '-' + messageDate.getMonth() + '-' + messageDate.getFullYear() + ' ' + messageDate.getHours() + ':' + messageDate.getMinutes();
 
-						angular.forEach(chat[0], function (chatdata, key) {
+					chatdata.imageloaded = false;
+					chatdata.id = key;
+					var users = fb.ref("users/" + chatdata.userId);
+					var user = $firebaseArray(users);
+					user.$loaded()
+						.then(function () {
+							angular.forEach(user, function (userdat) {
+								if (userdat.$id == 'name') {
 
-							var messageDate = new Date(chatdata.datetime);
-							chatdata.messageDate = messageDate.getDate() + '-' + messageDate.getMonth() + '-' + messageDate.getFullYear() + ' ' + messageDate.getHours() + ':' + messageDate.getMinutes();
+									chatdata.name = userdat.$value;
+								}
+								if (userdat.$id == 'email') {
+									var curuser = firebase.auth().currentUser;
+									var curemail;
+									if (curuser) {
+										curemail = curuser.email;
+									} else {
+										$state.go('login');
+									}
 
-							chatdata.imageloaded = false;
-							chatdata.id = key;
-							var users = fb.ref("users/" + chatdata.userId);
-							var user = $firebaseArray(users);
-							user.$loaded()
-								.then(function () {
-									angular.forEach(user, function (userdat) {
-										if (userdat.$id == 'name') {
-
-											chatdata.name = userdat.$value;
-										}
-										if (userdat.$id == 'email') {
-											var curuser = firebase.auth().currentUser;
-											var curemail;
-											if (curuser) {
-												curemail = curuser.email;
-											} else {
-												$state.go('login');
-											}
-
-											if (curemail == userdat.$value) {
-												chatdata.self = true;
-											} else {
-												chatdata.self = false;
-											}
+									if (curemail == userdat.$value) {
+										chatdata.self = true;
+									} else {
+										chatdata.self = false;
+									}
 
 
-										}
-									});
+								}
+							});
 
-								});
 						});
-						$('.loader').hide();
-						$ionicScrollDelegate.scrollBottom();
-					})
 				});
+				$('.loader').hide();
+				$ionicScrollDelegate.scrollBottom();
+			});
+
 		}
 		function writeMessageData(chatId, messageId, content, datetime, read, userId, type) {
 			var fb = firebase.database();
@@ -706,6 +692,10 @@ angular.module('humpieDumpie.app.controllers', [])
 				read : read,
 				userId : userId,
 				type: type
+			});
+			fb.ref('chats/' + chatId).update({
+				lastsend: firebase.auth().currentUser.email,
+				read: 0
 			});
 			init();
 		}
@@ -953,6 +943,14 @@ angular.module('humpieDumpie.app.controllers', [])
 					name: name,
 					role : role
 				});
+
+
+		}
+		function writeChatData(chatId, messages, parentId) {
+			fb.ref('chats/' + chatId).set({
+				messages: messages,
+				parentId: parentId
+			});
 		}
 
 		$scope.doUserAdd = function () {
@@ -979,18 +977,54 @@ angular.module('humpieDumpie.app.controllers', [])
 						hasAdded = true;
 						users.once('value', function (data) {
 							var allUsers = data.val();
-
+							var userid;
 							if (allUsers == null) {
-									writeUserData(0, $scope.formData.email, $scope.formData.name , userType, $scope.formData.class);
+								userid = 0;
+									writeUserData(userid, $scope.formData.email, $scope.formData.name , userType);
 								} else {
-									writeUserData(allUsers.length, $scope.formData.email, $scope.formData.name , userType, '');
+								userid = allUsers.length;
+									writeUserData(userid, $scope.formData.email, $scope.formData.name , userType);
+								}
+
+								if(userType == 'ouder') {
+
+									var chats = fb.ref('chats');
+									var chatRef = chats.orderByChild('parentId').equalTo(userid);
+									var chatdata = $firebaseArray(chatRef);
+									chatdata.$loaded()
+										.then(function () {
+											console.log('chatdata loaded');
+											if (chatdata.length > 0) {
+												console.log('got chat');
+												var chatid = chatdata[0].$id;
+												$state.go('app.singleChat', {"chatID": chatid});
+
+											} else {
+												console.log('no chat');
+												var chats = fb.ref('chats');
+
+												chats.once('value', function (data) {
+
+													var allChats = data.val();
+													if (allChats == null) {
+														writeChatData(0, [], userid);
+														$state.go('app.singleChat', {"chatID": 0});
+													} else {
+														writeChatData(allChats.length, [], userid);
+														$state.go('app.singleChat', {"chatID": allChats.length});
+													}
+												});
+											}
+										});
 								}
 
 
-						});
+
+
 
 						$state.go('app.management');
 
+					});
 					}
 
 				} else {

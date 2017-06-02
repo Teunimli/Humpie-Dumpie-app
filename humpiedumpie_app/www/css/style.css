@@ -9,8 +9,14 @@
 ion-content, .innerabsenceform, .form-fields-outer {
     background: #ffc900;
 }
-
-/*Loader*/
+.ion-android-send {
+    font-size: 20px;
+}
+.messageForm button[type=submit] {
+    background: transparent;
+    border: 0;
+}
+    /*Loader*/
 .loader {
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3498db; /* Blue */

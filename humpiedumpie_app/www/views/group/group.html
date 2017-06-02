@@ -2,6 +2,10 @@
 	<ion-nav-title>Groep</ion-nav-title>
 
 	<ion-content>
+		<ion-refresher
+				pulling-text="Trek om te verversen..."
+				on-refresh="doRefresh()">
+		</ion-refresher>
 		<ion-list class="group_child_list">
 			<ion-item ng-repeat="child in childs">
 				<div class="childContent" ng-if="child.isprecence == 1" ui-sref="app.child_detail({ childId: child.id })">

@@ -4,7 +4,7 @@
 	<ion-content>
 		<div class="loader"></div>
 		<ion-list class="messages">
-			<ion-item ng-repeat="message in messages track by $index" ng-class="{self: message.self, other: !message.self}" ng-if="message.id">
+			<ion-item ng-repeat="message in messages track by $index" ng-class="{self: message.self, other: !message.self}" ng-if="message.id >= 0">
 				<p ng-if="message.type == 'text'">{{message.content}}</p>
 				<img class="messageImg img-{{message.id}}" ng-click="loadImg(message.id)" ng-if="message.type == 'image'" src="../../img/download_img.png" alt="image">
 				<span class="messageName">{{message.name}}</span>
@@ -14,7 +14,7 @@
 	<ion-footer-bar>
 		<form ng-submit="sendMessage('text', '')" class="messageForm" novalidate>
 			<input type="text" name="messageContent" ng-model="formData.messageContent">
-			<button type="submit">send</button>
+			<button type="submit"><i class="ion-android-send"></i></button>
 		</form>
 		<button class="button icon-left ion-android-attach" ng-click="openUpload()"><i class="ion-android-attach"></i></button>
 		<input type="file" name="image" accept="image/*" id="imageUpload" onchange="angular.element(this).scope().imageUpload(this)" ng-model="formData.image">
