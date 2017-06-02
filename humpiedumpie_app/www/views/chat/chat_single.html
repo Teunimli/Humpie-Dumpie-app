@@ -4,9 +4,9 @@
 	<ion-content>
 		<div class="loader"></div>
 		<ion-list class="messages">
-			<ion-item ng-repeat="message in messages" ng-class="{self: message.self, other: !message.self}" >
+			<ion-item ng-repeat="message in messages track by $index" ng-class="{self: message.self, other: !message.self}" ng-if="message.id">
 				<p ng-if="message.type == 'text'">{{message.content}}</p>
-				<img ng-if="message.type == 'image'" src="{{message.content}}" alt="image" class="messageImg">
+				<img class="messageImg img-{{message.id}}" ng-click="loadImg(message.id)" ng-if="message.type == 'image'" src="../../img/download_img.png" alt="image">
 				<span class="messageName">{{message.name}}</span>
 				<span class="messageTime">{{message.messageDate}}</span>
 			</ion-item>

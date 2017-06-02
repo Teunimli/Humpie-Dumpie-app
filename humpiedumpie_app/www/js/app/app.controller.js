@@ -1,95 +1,89 @@
 angular.module('humpieDumpie.app.controllers', [])
 
-	.controller('AppCtrl', function($scope, $ionicModal, $state, $firebaseArray) {
+	.controller('AppCtrl', function($scope, $ionicModal, $state, $firebaseArray, $location) {
+		// zet het logo voor in het menu
 		$scope.logo = "img/logo.png";
-		var curemail;
+
+		// Kijken of de gebruiker is ingelogd
+
 		var user = firebase.auth().currentUser;
-		if (user) {
-			curemail = user.email;
-		} else {
+		if (!user) {
 			$state.go('login');
 		}
-
+		// selecteer de firbase database met users
 		var fb = firebase.database();
-		var users = fb.ref('users');
-		var role;
-		$scope.menucontent = [];
 
 
 
 
+		// Functie om een chat aan te maken
 		function writeChatData(chatId, messages, parentId) {
 			fb.ref('chats/' + chatId).set({
 				messages: messages,
 				parentId: parentId
 			});
 		}
-		var fireRef = users.orderByChild('email').equalTo(curemail);
-		var curuser = $firebaseArray(fireRef);
 
-		curuser.$loaded()
-			.then(function () {
-				angular.forEach(curuser, function(user) {
-					role = user.role;
-					switch (role) {
-						case 'leidster':
-							$scope.menucontent = [
-								{
-									title: 'Huidige groep',
-									type: 'sref',
-									action: 'app.group'
-								},
-								{
-									title: 'Beheer',
-									type: 'sref',
-									action: 'app.management'
-								},
-								{
-									title: 'Chat',
-									type: 'sref',
-									action: 'app.chat'
-								},
-								{
-									title: 'Uitloggen',
-									type: 'click',
-									action: 'doLogOut()'
-								}
-							];
-							break;
-						case 'ouder':
+				var role = window.localStorage.getItem('role');
+				switch (role) {
+					case 'leidster':
+						$scope.menucontent = [
+							{
+								title: 'Huidige groep',
+								type: 'sref',
+								action: 'app.group'
+							},
+							{
+								title: 'Beheer',
+								type: 'sref',
+								action: 'app.management'
+							},
+							{
+								title: 'Chat',
+								type: 'sref',
+								action: 'app.chat'
+							},
+							{
+								title: 'Uitloggen',
+								type: 'click',
+								action: 'doLogOut()'
+							}
+						];
+						break;
+					case 'ouder':
 
-							$scope.menucontent = [
-								{
-									title: 'Chat',
-									type: 'click',
-									action: 'goToSingleChat()'
-								},
-								{
-									title: 'Absentie',
-									type: 'sref',
-									action: 'app.absence'
-								},
-								{
-									title: 'Uitloggen',
-									type: 'click',
-									action: 'doLogOut()'
-								}
-							];
+						$scope.menucontent = [
+							{
+								title: 'Chat',
+								type: 'click',
+								action: 'goToSingleChat()'
+							},
+							{
+								title: 'Absentie',
+								type: 'sref',
+								action: 'app.absence'
+							},
+							{
+								title: 'Uitloggen',
+								type: 'click',
+								action: 'doLogOut()'
+							}
+						];
 
-							break;
-						default:
-							$scope.menucontent = [
-								{
-									title: 'Uitloggen',
-									type: 'click',
-									action: 'doLogOut()'
-								}
-							];
-							break;
-					}
-				})
-			});
+						break;
+					default:
+						$scope.menucontent = [
+							{
+								title: 'Uitloggen',
+								type: 'click',
+								action: 'doLogOut()'
+							}
+						];
+						break;
+				}
 
+
+		// uitloggen
 		$scope.doLogOut = function () {
 			firebase.auth().signOut().then(function() {
 				$state.go('login');
@@ -98,9 +92,8 @@ angular.module('humpieDumpie.app.controllers', [])
 			});
 		};
 
-		$scope.goToUsers = function (userType) {
-			$state.go('app.users', {userType: userType});
-		};
+
+		// functie om naar de chat te gaan en als de chat nog niet bestaat om er 1 aan te maken
 		$scope.goToSingleChat = function() {
 			var users = fb.ref('users');
 			var fireRef = users.orderByChild('email').equalTo(firebase.auth().currentUser.email);
@@ -113,7 +106,6 @@ angular.module('humpieDumpie.app.controllers', [])
 					var chatdata = $firebaseArray(chatRef);
 					chatdata.$loaded()
 						.then(function () {
-							console.log(chatdata.length);
 							if (chatdata.length > 0) {
 								var chatid = chatdata[0].$id;
 								$state.go('app.singleChat', {"chatID": chatid});
@@ -140,6 +132,7 @@ angular.module('humpieDumpie.app.controllers', [])
 	})
 
 	.controller('parentHomeCtrl', function($scope, $ionicModal, $state, $firebaseArray) {
+		// het home scherm van de ouder vullen met items
 		$scope.menucontent = [
 			{
 				title: 'Chat',
@@ -159,12 +152,14 @@ angular.module('humpieDumpie.app.controllers', [])
 		];
 
 	})
-    .controller('AuthCtrl', function ($scope, $state, $ionicModal, $firebaseArray) {
+    .controller('AuthCtrl', function ($scope, $state, $ionicModal, $firebaseArray, $ionicHistory) {
+    	// de login pagina
 	    $scope.title = "Login";
         $scope.logo = "img/logo.png";
 	    $scope.data = {};
 		var fb = firebase.database();
 		var users = fb.ref('users');
+		// een listener voor het wijzigen van de gebruiker status
 		firebase.auth().onAuthStateChanged(function(user) {
 		    if (user) {
 		    	if($state.current.name == 'login') {
@@ -175,16 +170,19 @@ angular.module('humpieDumpie.app.controllers', [])
 					curuser.$loaded()
 						.then(function () {
 							angular.forEach(curuser, function(user) {
+								// naar de juiste pagina gaan voor de huidige gebruikers rol
+								window.localStorage.setItem('role', user.role);
 								role = user.role;
 								switch (role) {
 									case 'ouder':
-										$state.go('app.parentHome');
+										$ionicHistory.clearCache().then(function(){ $state.go('app.parentHome') });
+
 									break;
 									case 'leidster':
-										$state.go('app.group');
+										$ionicHistory.clearCache().then(function(){$state.go('app.group')});
 									break;
 									default:
-										$state.go('login');
+										$ionicHistory.clearCache().then(function(){$state.go('login')});
 									break;
 
 								}
@@ -196,8 +194,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 
         $scope.doLogIn = function () {
-
-			console.log('test2');
+			// inloggen met email en wachtwoord
         	var auth = firebase.auth();
 	        var email = $scope.data.username;
 	        var password = $scope.data.password;
@@ -215,14 +212,17 @@ angular.module('humpieDumpie.app.controllers', [])
 
     })
     
-    .controller('ManagementCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+    .controller('ManagementCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
+    	// firebase object aanmaken
 		var fb = firebase.database();
 
     })
 
-	.controller('ChildGroupCtrl', function ($scope, $stateParams, $firebaseArray, $state, $filter) {
+	.controller('ChildGroupCtrl', function ($scope, $stateParams, $firebaseArray, $state, $filter, $ionicHistory) {
+		// firebase object aanmaken
 		var fb = firebase.database();
 
+		// timestamp aanmaken voor de datum zonder tijd
 		var date = new Date();
 		var newdate = $filter('date')(new Date(date), 'yyyy-MM-dd');
 		var time = Math.round(new Date(newdate).getTime()/1000);
@@ -230,7 +230,7 @@ angular.module('humpieDumpie.app.controllers', [])
 		var realtime = currtime += '000';
 
 		var groups = fb.ref('groups');
-
+		// de groep ophalen die gelijk staat aan de huidige datum
 		var fireRef = groups.orderByChild('date').equalTo(realtime);
 		var allgroups = $firebaseArray(fireRef);
 
@@ -261,7 +261,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	})
 
-	.controller('childDetailCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('childDetailCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 
 		var childID = $stateParams.childId;
@@ -275,7 +275,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	})
 
-	.controller('GroupCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('GroupCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		$scope.formData = {};
 		$scope.object = {};
@@ -304,7 +304,7 @@ angular.module('humpieDumpie.app.controllers', [])
 					angular.forEach(allGroups, function(group) {
 
 						if(group.date == date){
-							$state.go('app.management');
+							$ionicHistory.goBack();
 						}else{
 							$state.go('app.addgroupchild',{ date: date });
 						}
@@ -353,7 +353,13 @@ angular.module('humpieDumpie.app.controllers', [])
 					});
 					fb.ref('/groups/' + 0 ).update({ childs:  $scope.childdata});
 
-					$state.go('app.management');
+					var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
+					$ionicHistory.viewHistory().forcedNav = {
+						viewId:     backView.viewId,
+						navAction: 'moveBack',
+						navDirection: 'back'
+					};
+					backView && backView.go();
 				} else {
 					var groepslength = allGroups.length;
 					writeDataData(groepslength, groupDate);
@@ -369,7 +375,13 @@ angular.module('humpieDumpie.app.controllers', [])
 					});
 					fb.ref('/groups/' + groepslength ).update({ childs:  $scope.childdata});
 
-					$state.go('app.management');
+					var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
+					$ionicHistory.viewHistory().forcedNav = {
+						viewId:     backView.viewId,
+						navAction: 'moveBack',
+						navDirection: 'back'
+					};
+					backView && backView.go();
 				}
 
 			});
@@ -377,7 +389,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	})
 
-	.controller('GroupChangeCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('GroupChangeCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 
 		var Groups = fb.ref('groups');
@@ -387,7 +399,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	})
 
-	.controller('GroupChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('GroupChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		$scope.isChecked = false;
 		$scope.selected = [];
@@ -432,13 +444,19 @@ angular.module('humpieDumpie.app.controllers', [])
 				childs:  $scope.childdata,
 				date: $scope.date
 			});
-			$state.go('app.management');
+			var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
+			$ionicHistory.viewHistory().forcedNav = {
+				viewId:     backView.viewId,
+				navAction: 'moveBack',
+				navDirection: 'back'
+			};
+			backView && backView.go();
 		}
 
 
 	})
 
-	.controller('ChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('ChildCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var user = firebase.auth().currentUser;
 		var fb = firebase.database();
         $scope.formData = {};
@@ -477,17 +495,17 @@ angular.module('humpieDumpie.app.controllers', [])
 
                 if (allChilds == null) {
                     writeChildData(0, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
-					$state.go('app.management');
+	                $ionicHistory.goBack();
 				} else {
                     writeChildData(allChilds.length, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
-					$state.go('app.management');
+	                $ionicHistory.goBack();
 				}
             });
         }
 
     })
 
-	.controller('ChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('ChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		$scope.formData = {};
 
@@ -515,11 +533,17 @@ angular.module('humpieDumpie.app.controllers', [])
 			var date_of_birth = $scope.formData.date_of_birth.getTime();
 
 			writeChildData(childID, $scope.formData.name, date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
-			$state.go('app.management');
+			var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
+			$ionicHistory.viewHistory().forcedNav = {
+				viewId:     backView.viewId,
+				navAction: 'moveBack',
+				navDirection: 'back'
+			};
+			backView && backView.go();
 		}
 	})
 
-	.controller('DeleteChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('DeleteChildCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		var Childs = fb.ref('childs');
 
@@ -539,7 +563,7 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
 	})
 
-	.controller('ChatCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('ChatCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		var chats = fb.ref('chats');
 		var allChats = $firebaseArray(chats);
@@ -553,7 +577,6 @@ angular.module('humpieDumpie.app.controllers', [])
 					parents.$loaded()
 						.then(function(){
 							angular.forEach(parents, function (parentdata) {
-								console.log(parentdata);
 								if(parentdata.$id == 'name') {
 									chat.name = parentdata.$value;
 								}
@@ -574,10 +597,12 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
 	})
 
-	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicScrollDelegate, $window, $timeout) {
-
+	.controller('SingleChatCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicScrollDelegate, $window, $timeout, $ionicHistory) {
+		init();
+		function init() {
 		var fb = firebase.database();
 		var chatid = $stateParams['chatID'];
+		$scope.chatid = chatid;
 		var messagesent = false;
 		$scope.sendMessage = function (type, image) {
 			if (!messagesent) {
@@ -602,9 +627,11 @@ angular.module('humpieDumpie.app.controllers', [])
 									}
 								} else {
 									if (messagedata.length <= 0) {
-										writeMessageData($stateParams['chatID'], 0, image, date.getTime(), 0, parseInt(userdata[0].$id), type);
+										writeMessageData($stateParams['chatID'], 0, 'image', date.getTime(), 0, parseInt(userdata[0].$id), type);
+										writeImageData($stateParams['chatID'], 0, image)
 									} else {
-										writeMessageData($stateParams['chatID'], messagedata.length, image, date.getTime(), 0, parseInt(userdata[0].$id), type);
+										writeMessageData($stateParams['chatID'], messagedata.length, 'image', date.getTime(), 0, parseInt(userdata[0].$id), type);
+										writeImageData($stateParams['chatID'], messagedata.length, image)
 									}
 								}
 								$state.go($state.current, {}, {reload: true});
@@ -629,10 +656,13 @@ angular.module('humpieDumpie.app.controllers', [])
 					$timeout(function() {
 						$scope.messages = chat[0];
 
-						angular.forEach(chat[0], function (chatdata) {
+						angular.forEach(chat[0], function (chatdata, key) {
 
 							var messageDate = new Date(chatdata.datetime);
 							chatdata.messageDate = messageDate.getDate() + '-' + messageDate.getMonth() + '-' + messageDate.getFullYear() + ' ' + messageDate.getHours() + ':' + messageDate.getMinutes();
+
+							chatdata.imageloaded = false;
+							chatdata.id = key;
 							var users = fb.ref("users/" + chatdata.userId);
 							var user = $firebaseArray(users);
 							user.$loaded()
@@ -667,8 +697,9 @@ angular.module('humpieDumpie.app.controllers', [])
 						$ionicScrollDelegate.scrollBottom();
 					})
 				});
-
+		}
 		function writeMessageData(chatId, messageId, content, datetime, read, userId, type) {
+			var fb = firebase.database();
 			fb.ref('chats/' + chatId + '/messages/' + messageId).set({
 				content: content,
 				datetime: datetime,
@@ -676,7 +707,14 @@ angular.module('humpieDumpie.app.controllers', [])
 				userId : userId,
 				type: type
 			});
-			// $state.go('app.rooster');
+			init();
+		}
+		function writeImageData(chatId, messageId, content) {
+			var fb = firebase.database();
+			fb.ref('imagedata/' + chatId + '/images/' + messageId).set({
+				image: content
+			});
+			init();
 		}
 
 
@@ -686,6 +724,23 @@ angular.module('humpieDumpie.app.controllers', [])
 		$(".ion-android-attach").click(function () {
 			$scope.imageUpload();
 		});
+		
+		$scope.loadImg = function (messageId) {
+			var fb = firebase.database();
+			var imageref = fb.ref("imagedata/" + $scope.chatid + '/images/' + messageId);
+			var image = $firebaseArray(imageref);
+
+			image.$loaded()
+				.then(function () {
+					if(!$scope.messages[messageId].imageloaded) {
+						$scope.messages[messageId].imageloaded = true;
+						$(".img-" + messageId).attr("src", image[0].$value);
+					}
+
+				});
+
+
+		};
 		$scope.imageUpload = function(ele) {
 
 
@@ -729,88 +784,8 @@ angular.module('humpieDumpie.app.controllers', [])
 		};
 	})
 
-	.controller('AdminCtrl', function($scope, $state, $firebaseArray) {
-		$scope.title = 'Admin overzicht';
 
-		$scope.menucontent = [
-			{
-				title: 'Leerlingen',
-				type: 'click',
-				action: 'goToUsers(\'leerling\')'
-			},
-			{
-				title: 'Docenten',
-				type: 'click',
-				action: 'goToUsers(\'docent\')'
-			},
-			{
-				title: 'Roostermakers',
-				type: 'click',
-				action: 'goToUsers(\'roostermaker\')'
-			},
-			{
-				title: 'Admins',
-				type: 'click',
-				action: 'goToUsers(\'admin\')'
-			},
-			{
-				title: 'Klassen',
-				type: 'sref',
-				action: 'app.classes'
-			},
-			{
-				title: 'Lokalen',
-				type: 'sref',
-				action: ''
-			}
-		];
-
-		var fb = firebase.database();
-		var users = fb.ref('users');
-		var user = firebase.auth().currentUser;
-
-		if (user) {
-			var curemail = user.email;
-		} else {
-			$state.go('login');
-		}
-
-		var role;
-
-
-		var fireRef = users.orderByChild('email').equalTo(curemail);
-		var curuser = $firebaseArray(fireRef);
-
-		curuser.$loaded()
-			.then(function () {
-				angular.forEach(curuser, function (user) {
-					role = user.role;
-
-					switch (role) {
-						case 'leerling':
-							$scope.canAdd = false;
-							break;
-						case 'docent':
-							$scope.canAdd = false;
-							break;
-						case 'roostermaker':
-							$scope.canAdd = true;
-							break;
-						case 'admin':
-							$scope.canAdd = true;
-							break;
-						default:
-							$scope.canAdd = false;
-							break;
-					}
-				})
-			})
-	})
-
-
-
-
-	.controller('PresenceCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('PresenceCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 
 		var fb = firebase.database();
 		var users = fb.ref('users');
@@ -875,11 +850,11 @@ angular.module('humpieDumpie.app.controllers', [])
 	})
 
 
-	.controller('UserTypeListCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
-		console.log('UserTypeListCtrl');
+	.controller('UserTypeListCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
+
 	})
 
-	.controller('SelectParentCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('SelectParentCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 
 		var users = fb.ref('users');
@@ -889,7 +864,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	})
 	
-	.controller('SelectParentChildCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('SelectParentChildCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		$scope.formData = {};
 		$scope.isChecked = false;
@@ -930,7 +905,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 	})
 
-	.controller('UserCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('UserCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		$scope.formData = {};
 		var userType = $stateParams.userType;
 		$scope.userType = userType;
@@ -1036,7 +1011,7 @@ angular.module('humpieDumpie.app.controllers', [])
 	})
 
 
-	.controller('ClassesCtrl', function ($scope, $stateParams, $firebaseArray, $state) {
+	.controller('ClassesCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		$scope.formData = {};
 
@@ -1082,7 +1057,7 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
 	})
 
-    .controller('LessonCtrl', function($scope, $state){
+    .controller('LessonCtrl', function($scope, $state, $ionicHistory){
 	    $scope.title = "Les toevoegen";
         var fb = firebase.database();
         $scope.formData = {};
@@ -1124,7 +1099,7 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
     })
 
-	.controller('AbsenceCtrl', function($scope, $state, $firebaseArray, $filter){
+	.controller('AbsenceCtrl', function($scope, $state, $firebaseArray, $filter, $ionicHistory){
 		var user = firebase.auth().currentUser;
 		var fb = firebase.database();
 		var users = fb.ref('users');
@@ -1150,7 +1125,6 @@ angular.module('humpieDumpie.app.controllers', [])
 
 					var fireRef = absence.orderByChild('email').equalTo(curemail);
 					var allAbsence = $firebaseArray(fireRef);
-					console.log($scope.allAbsence);
 
 
 					allAbsence.$loaded()
@@ -1255,7 +1229,7 @@ angular.module('humpieDumpie.app.controllers', [])
 	})
 
 
-	.controller('ChildAbsence', function($scope, $state, $firebaseArray, $filter, $stateParams){
+	.controller('ChildAbsence', function($scope, $state, $firebaseArray, $filter, $stateParams, $ionicHistory){
 		var childID = $stateParams.childId;
 		var fb = firebase.database();
 		var fireRef = fb.ref('absence').orderByChild('childId').equalTo(childID);
