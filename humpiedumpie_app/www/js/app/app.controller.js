@@ -637,8 +637,7 @@ angular.module('humpieDumpie.app.controllers', [])
 				$scope.messages = chat.messages;
 				if(chat.lastsend != firebase.auth().currentUser.email) {
 					fb.ref('chats/' + chatid).update({
-						lastsend: firebase.auth().currentUser.email,
-						read: 0
+						read: 1
 					});
 				}
 
