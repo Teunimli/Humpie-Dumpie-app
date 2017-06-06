@@ -206,8 +206,16 @@ angular.module('humpieDumpie.app.controllers', [])
 			var date = new Date();
 			var newdate = $filter('date')(new Date(date), 'yyyy-MM-dd');
 			var time = Math.round(new Date(newdate).getTime() / 1000);
-			var currtime = time - 7200;
-			var realtime = currtime += '000';
+			if(window.cordova){
+				//voor in de app
+				var realtime = time + '000';
+			}else{
+				//voor op computer werkend te krijgen
+				console.log('hallo');
+			 	var currtime = time - 7200;
+				var realtime = currtime + '000';
+			}
+
 
 			var groups = fb.ref('groups');
 			// de groep ophalen die gelijk staat aan de huidige datum
@@ -226,6 +234,7 @@ angular.module('humpieDumpie.app.controllers', [])
 		}
 
 		$scope.notPresence = function(groupid, id){
+			var fb = firebase.database();
 
 			function writeChildData(id, ispresence) {
 				fb.ref('groups/' + groupid + '/childs/' + id).update({
