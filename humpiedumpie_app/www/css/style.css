@@ -216,4 +216,5 @@ ion-side-menu ion-content {
 }
 .item p {
     color: white;
+    white-space: normal;
 }

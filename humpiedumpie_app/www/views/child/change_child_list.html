@@ -3,8 +3,8 @@
 
     <ion-content>
         <ion-list class="change_child_list">
-            <ion-item ng-repeat="child in allChilds">
-                <div class="childContent" ui-sref="app.change_child({ childId: child.$id })">
+            <ion-item ng-repeat="child in allChilds" ui-sref="app.change_child({ childId: child.$id })">
+                <div class="childContent" >
                     <p><b>Naam: {{child.name}}</b></p>
                 </div>
             </ion-item>

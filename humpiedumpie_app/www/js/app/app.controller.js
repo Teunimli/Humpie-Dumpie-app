@@ -211,7 +211,6 @@ angular.module('humpieDumpie.app.controllers', [])
 				var realtime = time + '000';
 			}else{
 				//voor op computer werkend te krijgen
-				console.log('hallo');
 			 	var currtime = time - 7200;
 				var realtime = currtime + '000';
 			}
@@ -342,13 +341,7 @@ angular.module('humpieDumpie.app.controllers', [])
 					});
 					fb.ref('/groups/' + 0 ).update({ childs:  $scope.childdata});
 
-					var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
-					$ionicHistory.viewHistory().forcedNav = {
-						viewId:     backView.viewId,
-						navAction: 'moveBack',
-						navDirection: 'back'
-					};
-					backView && backView.go();
+					$ionicHistory.goBack(-2);
 				} else {
 					var groepslength = allGroups.length;
 					writeDataData(groepslength, groupDate);
@@ -364,13 +357,7 @@ angular.module('humpieDumpie.app.controllers', [])
 					});
 					fb.ref('/groups/' + groepslength ).update({ childs:  $scope.childdata});
 
-					var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
-					$ionicHistory.viewHistory().forcedNav = {
-						viewId:     backView.viewId,
-						navAction: 'moveBack',
-						navDirection: 'back'
-					};
-					backView && backView.go();
+					$ionicHistory.goBack(-2);
 				}
 
 			});
@@ -433,13 +420,7 @@ angular.module('humpieDumpie.app.controllers', [])
 				childs:  $scope.childdata,
 				date: $scope.date
 			});
-			var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
-			$ionicHistory.viewHistory().forcedNav = {
-				viewId:     backView.viewId,
-				navAction: 'moveBack',
-				navDirection: 'back'
-			};
-			backView && backView.go();
+			$ionicHistory.goBack(-2);
 		}
 
 
@@ -494,6 +475,13 @@ angular.module('humpieDumpie.app.controllers', [])
 
     })
 
+	.controller('ChildsCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
+		var fb = firebase.database();
+		$scope.childs  = $firebaseArray(fb.ref("childs").orderByChild('isDeleted').equalTo(0));
+
+
+	})
+
 	.controller('ChangeChildCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		$scope.formData = {};
@@ -520,13 +508,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 		$scope.doChildUpdate = function(){
 			writeChildData(childID, $scope.formData.name, $scope.formData.date_of_birth, $scope.formData.email, $scope.formData.phonenumber, $scope.formData.second_phonenumber, $scope.formData.docter_phonenumber, $scope.formData.homedocter_phonenumber, $scope.formData.peculiarities, 0);
-			var backView = $ionicHistory.viewHistory().views[$ionicHistory.viewHistory().backView.backViewId];
-			$ionicHistory.viewHistory().forcedNav = {
-				viewId:     backView.viewId,
-				navAction: 'moveBack',
-				navDirection: 'back'
-			};
-			backView && backView.go();
+			$ionicHistory.goBack(-2);
 		}
 	})
 
@@ -553,31 +535,31 @@ angular.module('humpieDumpie.app.controllers', [])
 	.controller('ChatCtrl', function ($scope, $stateParams, $firebaseArray, $state, $ionicHistory) {
 		var fb = firebase.database();
 		var chats = fb.ref('chats');
-		var allChats = $firebaseArray(chats);
+		chats.on('value', function (data) {
+			var allChats = data.val();
+			angular.forEach(allChats, function(chat, key) {
+				chat.$id = key;
+				if(chat.lastsend != firebase.auth().currentUser.email && chat.read == 0) {
+					chat.dobold = true;
+				} else {
+					chat.dobold = false;
+				}
+				var parent = fb.ref("users/" + chat.parentId);
+				var parents = $firebaseArray(parent);
 
-		allChats.$loaded()
-			.then(function(){
-				angular.forEach(allChats, function(chat) {
-					if(chat.lastsend != firebase.auth().currentUser.email && chat.read == 0) {
-						chat.dobold = true;
-					} else {
-						chat.dobold = false;
-					}
-					var parent = fb.ref("users/" + chat.parentId);
-					var parents = $firebaseArray(parent);
+				parents.$loaded()
+					.then(function(){
+						angular.forEach(parents, function (parentdata) {
+							if(parentdata.$id == 'name') {
+								chat.name = parentdata.$value;
+							}
+						});
+						$scope.allChats = allChats;
+					})
 
-					parents.$loaded()
-						.then(function(){
-							angular.forEach(parents, function (parentdata) {
-								if(parentdata.$id == 'name') {
-									chat.name = parentdata.$value;
-								}
-							});
-							$scope.allChats = allChats;
-						})
+			})
+		});
 
-				})
-			});
 
 
 
@@ -684,7 +666,7 @@ angular.module('humpieDumpie.app.controllers', [])
 
 								}
 							});
-
+							$ionicScrollDelegate.scrollBottom();
 						});
 				});
 				$('.loader').hide();
@@ -897,7 +879,7 @@ angular.module('humpieDumpie.app.controllers', [])
 			})
 
 			fb.ref('/users/' + parentid ).update({ childs:  $scope.childdata});
-			$state.go('app.management');
+			$ionicHistory.goBack(-2);
 
 		}
 
@@ -963,93 +945,102 @@ angular.module('humpieDumpie.app.controllers', [])
 
 		$scope.doUserAdd = function () {
 
+			firebase.auth().currentUser.reauthenticate(firebase.auth.EmailAuthProvider.credential(firebase.auth().currentUser.email, $scope.formData.currentUserPassword)).then(function (user) {
+				var users = fb.ref('users');
+				var hasAdded = false;
+				var inputuser = $firebaseArray(users.orderByChild('email').equalTo($scope.formData.email));
 
-			var users = fb.ref('users');
-			var hasAdded = false;
+				inputuser.$loaded()
+					.then(function(){
+						if(inputuser.length < 1) {
+							firebase.auth().onAuthStateChanged(function (user) {
+								if (user) {
+									if (user.email != curemail) {
+										firebase.auth().signOut().then(function () {
+											firebase.auth().signInWithEmailAndPassword(curemail, $scope.formData.currentUserPassword).catch(function (error) {
+												// Handle Errors here.
+												var errorCode = error.code;
+												var errorMessage = error.message;
 
-			firebase.auth().onAuthStateChanged(function(user) {
-				if (user) {
-					if(user.email != curemail) {
-						firebase.auth().signOut().then(function () {
-							firebase.auth().signInWithEmailAndPassword(curemail, $scope.formData.currentUserPassword).catch(function (error) {
+												alert(errorMessage);
+											});
+										}).catch(function (error) {
+											alert(error);
+										});
+									} else if (!hasAdded) {
+										hasAdded = true;
+										users.once('value', function (data) {
+											var allUsers = data.val();
+											var userid;
+											if (allUsers == null) {
+												userid = 0;
+												writeUserData(userid, $scope.formData.email, $scope.formData.name, userType);
+											} else {
+												userid = allUsers.length;
+												writeUserData(userid, $scope.formData.email, $scope.formData.name, userType);
+											}
+
+											if (userType == 'ouder') {
+
+												var chats = fb.ref('chats');
+												var chatRef = chats.orderByChild('parentId').equalTo(userid);
+												var chatdata = $firebaseArray(chatRef);
+												chatdata.$loaded()
+													.then(function () {
+
+														if (chatdata.length > 0) {
+
+														} else {
+															var chats = fb.ref('chats');
+
+															chats.once('value', function (data) {
+
+																var allChats = data.val();
+																if (allChats == null) {
+																	writeChatData(0, [], userid);
+																} else {
+																	writeChatData(allChats.length, [], userid);
+																}
+															});
+														}
+													});
+											}
+
+
+											$state.go('app.management');
+
+										});
+									}
+
+								} else {
+									// No user is signed in.
+								}
+							});
+							firebase.auth().createUserWithEmailAndPassword($scope.formData.email, $scope.formData.password).catch(function (error) {
 								// Handle Errors here.
 								var errorCode = error.code;
 								var errorMessage = error.message;
-
 								alert(errorMessage);
+								// ...
 							});
-						}).catch(function (error) {
-							alert(error);
-						});
-					} else if(!hasAdded) {
-						hasAdded = true;
-						users.once('value', function (data) {
-							var allUsers = data.val();
-							var userid;
-							if (allUsers == null) {
-								userid = 0;
-									writeUserData(userid, $scope.formData.email, $scope.formData.name , userType);
-								} else {
-								userid = allUsers.length;
-									writeUserData(userid, $scope.formData.email, $scope.formData.name , userType);
-								}
-
-								if(userType == 'ouder') {
-
-									var chats = fb.ref('chats');
-									var chatRef = chats.orderByChild('parentId').equalTo(userid);
-									var chatdata = $firebaseArray(chatRef);
-									chatdata.$loaded()
-										.then(function () {
-											console.log('chatdata loaded');
-											if (chatdata.length > 0) {
-												console.log('got chat');
-												var chatid = chatdata[0].$id;
-												$state.go('app.singleChat', {"chatID": chatid});
-
-											} else {
-												console.log('no chat');
-												var chats = fb.ref('chats');
-
-												chats.once('value', function (data) {
-
-													var allChats = data.val();
-													if (allChats == null) {
-														writeChatData(0, [], userid);
-														$state.go('app.singleChat', {"chatID": 0});
-													} else {
-														writeChatData(allChats.length, [], userid);
-														$state.go('app.singleChat', {"chatID": allChats.length});
-													}
-												});
-											}
-										});
-								}
-
-
-
-
-
-						$state.go('app.management');
-
+						} else {
+							alert("gebruiker bestaat al");
+						}
 					});
-					}
 
-				} else {
-					// No user is signed in.
-				}
-			});
 
-			firebase.auth().createUserWithEmailAndPassword($scope.formData.email, $scope.formData.password).catch(function(error) {
-				// Handle Errors here.
-				var errorCode = error.code;
-				var errorMessage = error.message;
-				alert(errorMessage);
-				// ...
+			}).catch(function (error) {
+				alert("Fout wachtwoord");
+
 			});
 
 
-		}
+
+
+
+			}
+
+
 	})
 
 

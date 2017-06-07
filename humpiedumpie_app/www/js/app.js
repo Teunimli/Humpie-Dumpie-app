@@ -240,6 +240,16 @@ angular.module('humpieDumpie', [
 			  }
 		  })
 
+	      .state('app.childs', {
+		      url: "/childs",
+		      views: {
+			      'menuContent': {
+				      templateUrl   : "views/child/child_list.html",
+				      controller: 'ChildsCtrl'
+			      }
+		      }
+	      })
+
 	      .state('app.user_add', {
 		      url: "/user_add:userType",
 		      views: {

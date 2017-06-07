@@ -1,0 +1,11 @@
+<ion-view class="child_list-view">
+	<ion-nav-title>Kinderen</ion-nav-title>
+
+	<ion-content>
+		<ion-list>
+			<ion-item ng-repeat="child in childs" ui-sref="app.child_detail({ childId: child.$id })">
+				{{child.name}}
+			</ion-item>
+		</ion-list>
+	</ion-content>
+</ion-view>
