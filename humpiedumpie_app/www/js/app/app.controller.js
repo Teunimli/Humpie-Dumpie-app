@@ -1064,7 +1064,7 @@ angular.module('humpieDumpie.app.controllers', [])
 											}
 
 
-											$state.go('app.management');
+											$ionicHistory.goBack(-2);
 
 										});
 									}

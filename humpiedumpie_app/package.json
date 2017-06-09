@@ -6,6 +6,7 @@
         "angularfire": "^2.3.0",
         "com.guinatal.refreshgallery": "https://github.com/lotterfriends/refreshgallery",
         "cordova-android": "^6.2.3",
+        "cordova-browser": "^4.1.0",
         "cordova-plugin-console": "^1.0.7",
         "cordova-plugin-device": "^1.1.6",
         "cordova-plugin-file": "^4.0.0",
@@ -50,7 +51,8 @@
             "ionic-plugin-keyboard": {}
         },
         "platforms": [
-            "android"
+            "android",
+            "browser"
         ]
     }
 }
